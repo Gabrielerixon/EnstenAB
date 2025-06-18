@@ -4,16 +4,13 @@
 import { useState, Suspense } from 'react'
 import { useParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Zap, Shield, Cpu, Download, ExternalLink, Play, Info, Star, Box } from 'lucide-react'
+import { ArrowLeft, Zap, Shield, Cpu, Download, ExternalLink, Star, Box } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/common/Button'
 import { getProductById } from '@/lib/products-data'
-import { Product } from '@/lib/types'
-import { CurrentOne3DShowcase } from '@/components/3d/CurrentOne3DShowcase'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, useGLTF } from '@react-three/drei'
-import * as THREE from 'three'
 
 // Define gallery item types
 interface GalleryItem3D {
@@ -35,7 +32,7 @@ interface GalleryItemImage {
 type GalleryItemType = GalleryItem3D | GalleryItemImage
 
 // Interactive 3D Model Component
-function Interactive3DModel({ modelPath, name }: { modelPath: string; name: string }) {
+function Interactive3DModel({ modelPath }: { modelPath: string }) {
   const gltf = useGLTF(modelPath)
 
   return (
@@ -44,7 +41,7 @@ function Interactive3DModel({ modelPath, name }: { modelPath: string; name: stri
 }
 
 // 3D Viewer Component
-function Model3DViewer({ modelPath, name }: { modelPath: string; name: string }) {
+function Model3DViewer({ modelPath }: { modelPath: string }) {
   return (
     <div className="w-full h-full">
       <Canvas
@@ -66,7 +63,7 @@ function Model3DViewer({ modelPath, name }: { modelPath: string; name: string })
         <pointLight position={[-10, -10, -5]} intensity={0.3} />
         
         <Suspense fallback={null}>
-          <Interactive3DModel modelPath={modelPath} name={name} />
+          <Interactive3DModel modelPath={modelPath} />
         </Suspense>
         
         <OrbitControls 
@@ -139,7 +136,7 @@ export default function ProductPage() {
       <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon flex items-center justify-center">
         <div className="text-center text-white">
           <h1 className="text-2xl font-racing font-bold mb-2">Product Not Found</h1>
-          <p className="text-white/70 font-tech mb-6">The product you're looking for doesn't exist.</p>
+          <p className="text-white/70 font-tech mb-6">The product you&apos;re looking for doesn&apos;t exist.</p>
           <Link href="/products">
             <Button variant="primary">Back to Products</Button>
           </Link>
@@ -211,8 +208,7 @@ export default function ProductPage() {
                 {activeGalleryItem?.type === '3d-model' ? (
                   <div className="w-full h-full">
                     <Model3DViewer 
-                      modelPath={activeGalleryItem.src} 
-                      name={getItemDisplayName(activeGalleryItem)} 
+                      modelPath={activeGalleryItem.src}
                     />
                     
                     {/* 3D Controls Overlay */}
@@ -365,7 +361,7 @@ export default function ProductPage() {
               ].map((tab) => (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
+                  onClick={() => setActiveTab(tab.key as 'overview' | 'specs' | 'downloads')}
                   className={`px-6 py-3 rounded-md font-tech font-medium transition-all ${
                     activeTab === tab.key
                       ? 'bg-solar-electric text-white'

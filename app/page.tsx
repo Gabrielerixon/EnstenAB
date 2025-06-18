@@ -2,9 +2,10 @@
 
 import { Hero } from '@/components/hero/Hero'
 import { motion } from 'framer-motion'
-import { ArrowRight, Zap, Shield, Cpu, Sun, Award, TrendingUp } from 'lucide-react'
+import { ArrowRight, Zap, Shield, Cpu, Sun } from 'lucide-react'
 import TestimonialsSection from '@/components/sections/TestimonialsSection'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Home() {
   return (
@@ -495,7 +496,7 @@ export default function Home() {
               RACE-WINNING <span className="text-gradient">PRODUCTS</span>
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto font-tech">
-              Engineered for champions. Tested in the world's most demanding solar racing conditions.
+              Engineered for champions. Tested in the world&apos;s most demanding solar racing conditions.
             </p>
           </motion.div>
 
@@ -538,7 +539,7 @@ export default function Home() {
                   
                   {/* Product Image */}
                   <div className="h-48 bg-gradient-to-br from-solar-electric/10 to-solar-gold/10 flex items-center justify-center relative overflow-hidden">
-                    <img
+                    <Image
                       src={
                         product.name === "Current One" 
                           ? "/images/products/current-one/currentOne.png"
@@ -547,6 +548,8 @@ export default function Home() {
                           : "/images/products/cansuba/cansuba.png"
                       }
                       alt={product.name}
+                      width={400}
+                      height={192}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         // Fallback to placeholder if image fails to load

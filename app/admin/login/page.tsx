@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { motion } from 'framer-motion'
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { 
   Lock, 
@@ -15,9 +15,7 @@ import {
   EyeOff, 
   AlertCircle, 
   CheckCircle,
-  Zap,
   Shield,
-  Users,
   ArrowLeft
 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
@@ -81,9 +79,10 @@ export default function AdminLoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password)
       // Redirect will happen via useEffect
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error)
-      switch (error.code) {
+      const firebaseError = error as { code?: string }
+      switch (firebaseError.code) {
         case 'auth/user-not-found':
           setLoginError('No account found with this email address.')
           break

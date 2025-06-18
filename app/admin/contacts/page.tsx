@@ -12,9 +12,6 @@ import {
   User, 
   Building, 
   MessageSquare,
-  Phone,
-  Globe,
-  Filter,
   Search,
   Eye,
   Trash2
@@ -74,7 +71,7 @@ const mockContacts: ContactForm[] = [
 
 export default function AdminContactsPage() {
   const [user, loading] = useAuthState(auth)
-  const [contacts, setContacts] = useState<ContactForm[]>(mockContacts)
+  const [contacts] = useState<ContactForm[]>(mockContacts)
   const [filteredContacts, setFilteredContacts] = useState<ContactForm[]>(mockContacts)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'new' | 'read' | 'replied'>('all')
@@ -190,7 +187,7 @@ export default function AdminContactsPage() {
             {/* Status Filter */}
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'new' | 'read' | 'replied')}
               className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric"
             >
               <option value="all">All Status</option>

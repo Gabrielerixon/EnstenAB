@@ -1,8 +1,7 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { Button } from '@/components/common/Button'
+import { motion } from 'framer-motion'
 import { CurrentOne3DShowcase } from '@/components/3d/CurrentOne3DShowcase'
 import Link from 'next/link'
 

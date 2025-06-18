@@ -8,11 +8,9 @@ import { motion } from 'framer-motion'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { 
-  BarChart3, 
   BookOpen, 
   Users, 
   Settings, 
-  FileText, 
   Mail, 
   TrendingUp,
   LogOut,

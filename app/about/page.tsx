@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Zap, Target, Users, Award, MapPin, Calendar, ArrowRight } from 'lucide-react'
+import { Zap, Target, Award, MapPin, Calendar, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AboutPage() {
@@ -33,7 +33,7 @@ export default function AboutPage() {
             
             <p className="text-xl text-white/80 max-w-4xl mx-auto font-tech leading-relaxed">
               Swedish innovation meets solar racing excellence. We develop cutting-edge control systems 
-              that empower teams to achieve championship performance in the world's most demanding 
+              that empower teams to achieve championship performance in the world&apos;s most demanding 
               solar racing competitions.
             </p>
           </motion.div>
@@ -58,8 +58,8 @@ export default function AboutPage() {
               </div>
               <p className="text-white/90 font-tech text-lg leading-relaxed">
                 To accelerate the development of sustainable transportation by providing world-class 
-                control systems for solar racing teams. We believe that today's student engineers 
-                are tomorrow's automotive innovators.
+                control systems for solar racing teams. We believe that today&apos;s student engineers 
+                are tomorrow&apos;s automotive innovators.
               </p>
             </motion.div>
 
@@ -213,7 +213,7 @@ export default function AboutPage() {
               
               <p className="text-white/90 font-tech text-lg leading-relaxed mb-6">
                 Based in Jönköping, Sweden, Ensten AB combines Nordic engineering excellence 
-                with cutting-edge technology. We're proud to continue Sweden's tradition of 
+                with cutting-edge technology. We&apos;re proud to continue Sweden&apos;s tradition of 
                 automotive innovation in the sustainable racing space.
               </p>
               
@@ -224,7 +224,7 @@ export default function AboutPage() {
                 </div>
                 <div className="flex items-center text-white/80 font-tech">
                   <div className="w-2 h-2 bg-solar-gold rounded-full mr-3" />
-                  <span>Located in Sweden's Technology Corridor</span>
+                  <span>Located in Sweden&apos;s Technology Corridor</span>
                 </div>
                 <div className="flex items-center text-white/80 font-tech">
                   <div className="w-2 h-2 bg-solar-racing rounded-full mr-3" />

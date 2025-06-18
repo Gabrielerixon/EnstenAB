@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Clock, User, Share2, BookOpen, Tag } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, BookOpen, Tag } from 'lucide-react'
 import { Article } from '@/lib/types'
 import { BlogService } from '@/lib/blog-service'
 import { formatDate } from '@/lib/utils'
@@ -16,10 +16,6 @@ export default function BlogPostPage() {
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
-
-  useEffect(() => {
-    loadArticle()
-  }, [slug])
 
   const loadArticle = async () => {
     try {
@@ -39,6 +35,10 @@ export default function BlogPostPage() {
     }
   }
 
+  useEffect(() => {
+    loadArticle()
+  }, [slug, loadArticle])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon flex items-center justify-center">
@@ -56,7 +56,7 @@ export default function BlogPostPage() {
         <div className="text-center text-white">
           <BookOpen className="w-16 h-16 text-white/60 mx-auto mb-4" />
           <h1 className="text-2xl font-racing font-bold mb-2">Article Not Found</h1>
-          <p className="text-white/70 font-tech mb-6">The article you're looking for doesn't exist.</p>
+          <p className="text-white/70 font-tech mb-6">The article you&apos;re looking for doesn&apos;t exist.</p>
           <Link href="/education">
             <button className="btn-primary px-6 py-3 rounded-lg font-tech font-semibold">
               Back to Education

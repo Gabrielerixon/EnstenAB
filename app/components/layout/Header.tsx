@@ -61,7 +61,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
-            {NAVIGATION_ITEMS.map((item, index) => (
+            {NAVIGATION_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

@@ -8,16 +8,13 @@ import {
   Phone, 
   MapPin, 
   Send, 
-  User, 
-  Building, 
-  MessageSquare, 
   Linkedin,
-  ExternalLink,
   CheckCircle,
   AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import Link from 'next/link'
+import Image from 'next/image'
 
 
 // Team members data
@@ -106,7 +103,7 @@ export default function ContactPage() {
       }
 
       setFormStatus('success')
-      setStatusMessage('Message sent successfully! We\'ll get back to you within 24 hours.')
+      setStatusMessage('Message sent successfully! We&apos;ll get back to you within 24 hours.')
       
       // Reset form
       setFormData({
@@ -419,9 +416,11 @@ export default function ContactPage() {
               >
                 {/* BIGGER Profile Images - Updated from w-24 h-24 to w-32 h-32 */}
                 <div className="w-32 h-32 rounded-full mx-auto mb-4 overflow-hidden border-2 border-solar-electric/50 relative">
-                  <img
+                  <Image
                     src={member.image}
                     alt={member.name}
+                    width={128}
+                    height={128}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       // Fallback to initials if image fails to load
@@ -491,7 +490,7 @@ export default function ContactPage() {
               Ready to Accelerate Your Project?
             </h2>
             <p className="text-xl text-white/90 mb-8 font-tech">
-              Let's discuss how Ensten's cutting-edge technology can power your solar racing success.
+              Let&apos;s discuss how Ensten&apos;s cutting-edge technology can power your solar racing success.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

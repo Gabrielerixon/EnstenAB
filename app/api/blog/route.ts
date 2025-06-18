@@ -1,7 +1,6 @@
 // app/api/blog/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { BlogService } from '@/lib/blog-service'
-import { verifyAdminUser } from '@/lib/firebase-admin'
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,7 +35,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const token = authHeader.split('Bearer ')[1]
+    // Token verification logic commented out for now
+    // const token = authHeader.split('Bearer ')[1]
     // You'll need to verify the token and get uid
     // const decodedToken = await adminAuth.verifyIdToken(token)
     // const isAdmin = await verifyAdminUser(decodedToken.uid)

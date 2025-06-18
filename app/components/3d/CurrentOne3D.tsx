@@ -41,7 +41,7 @@ function CurrentOneModel({ onHotspotClick }: { onHotspotClick: (hotspot: Hotspot
   const modelRef = useRef<THREE.Group>(null)
 
   // Auto-rotate the model
-  useFrame((state) => {
+  useFrame(() => {
     if (modelRef.current) {
       modelRef.current.rotation.y += 0.005
     }
@@ -100,6 +100,17 @@ function LoadingFallback() {
   )
 }
 
+// Simple model component without hotspots
+function SimpleModel() {
+  const gltf = useGLTF('/models/current-one/Current One.gltf')
+  return (
+    <primitive 
+      object={gltf.scene} 
+      scale={[2, 2, 2]} 
+    />
+  )
+}
+
 // Main component
 interface CurrentOne3DProps {
   className?: string
@@ -145,10 +156,7 @@ export const CurrentOne3D = ({
           {showHotspots ? (
             <CurrentOneModel onHotspotClick={handleHotspotClick} />
           ) : (
-            <primitive 
-              object={useGLTF('/models/current-one/Current One.gltf').scene} 
-              scale={[2, 2, 2]} 
-            />
+            <SimpleModel />
           )}
         </Suspense>
         

@@ -75,7 +75,7 @@ export const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <h3 className="text-xl font-bold mb-4">Join Our Journey</h3>
             <p className="text-gray-300 mb-4">
-              Stay updated on solar racing innovations and Ensten's latest developments.
+              Stay updated on solar racing innovations and Ensten&apos;s latest developments.
             </p>
             <Link 
               href="/contact"

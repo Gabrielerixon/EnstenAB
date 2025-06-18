@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Quote, ChevronDown, ChevronUp, Award, Trophy } from 'lucide-react'
+import Image from 'next/image'
 
 const testimonials = [
   {
@@ -100,7 +101,7 @@ export default function TestimonialsSection() {
                 {/* Quote Text */}
                 <div className="mb-6">
                   <blockquote className="text-white/90 font-tech text-lg leading-relaxed mb-4">
-                    "{testimonial.quote}"
+                    &ldquo;{testimonial.quote}&rdquo;
                   </blockquote>
                   
                   {/* Read More/Less Button */}
@@ -136,7 +137,7 @@ export default function TestimonialsSection() {
                     >
                       <div className="border-t border-white/20 pt-4 mb-6">
                         <blockquote className="text-white/80 font-tech leading-relaxed">
-                          "{testimonial.fullQuote}"
+                          &ldquo;{testimonial.fullQuote}&rdquo;
                         </blockquote>
                       </div>
                     </motion.div>
@@ -150,12 +151,14 @@ export default function TestimonialsSection() {
                     href={testimonial.company === 'JU Solar Team' ? 'https://www.jusolarteam.se/' : 'https://husolarteam.com/'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 hover:scale-105 transition-transform overflow-hidden cursor-pointer"
+                    className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 hover:scale-105 transition-transform overflow-hidden cursor-pointer relative"
                   >
-                    <img
+                    <Image
                       src={testimonial.company === 'JU Solar Team' ? '/images/logos/JU.avif' : '/images/logos/HUST.png'}
                       alt={`${testimonial.company} logo`}
-                      className="w-10 h-10 object-contain"
+                      width={40}
+                      height={40}
+                      className="object-contain"
                       onError={(e) => {
                         // Fallback to initials if image fails to load
                         const target = e.target as HTMLImageElement;

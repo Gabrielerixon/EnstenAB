@@ -1,7 +1,7 @@
 // components/blog/BlogAdmin.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Edit, Trash2, Save, X, Eye, Calendar, Tag } from 'lucide-react'
 import { Article, ArticleCategory, TeamMember } from '@/lib/types'

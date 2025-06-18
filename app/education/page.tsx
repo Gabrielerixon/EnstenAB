@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { BookOpen, Zap, TrendingUp, Users, Calendar, Star } from 'lucide-react'
+import { BookOpen, Users, Star } from 'lucide-react'
 import { BlogCard } from '@/components/blog/BlogCard'
 import { BlogFilters } from '@/components/blog/BlogFilters'
 import { Article, ArticleCategory } from '@/lib/types'
@@ -234,7 +234,7 @@ Start your preparation now to give your team the best chance of success in this 
 ]
 
 export default function EducationPage() {
-  const [articles, setArticles] = useState<Article[]>(mockArticles)
+  const [articles] = useState<Article[]>(mockArticles)
   const [filteredArticles, setFilteredArticles] = useState<Article[]>(mockArticles)
   const [selectedCategory, setSelectedCategory] = useState<ArticleCategory | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')

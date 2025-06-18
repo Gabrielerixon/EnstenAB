@@ -3,9 +3,9 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Calendar, Clock, User, ArrowRight, Tag } from 'lucide-react'
+import { Calendar, Clock,  ArrowRight } from 'lucide-react'
 import { Article } from '@/lib/types'
-import { formatDate, calculateReadingTime } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
 
 interface BlogCardProps {
   article: Article

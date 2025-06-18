@@ -15,8 +15,6 @@ import {
   Calendar, 
   Tag,
   Search,
-  Filter,
-  MoreHorizontal,
   ArrowLeft,
   Clock,
   User,

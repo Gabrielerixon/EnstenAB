@@ -33,18 +33,6 @@ function CurrentOneSimple() {
   )
 }
 
-// Simple loading fallback
-function SimpleLoadingFallback() {
-  return (
-    <div className="w-64 h-64 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
-      <div className="text-center text-white px-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
-        <span className="block text-sm">Loading...</span>
-      </div>
-    </div>
-  )
-}
-
 // Hero version - clean and simple
 interface CurrentOneHeroProps {
   className?: string

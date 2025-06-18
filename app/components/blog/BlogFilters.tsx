@@ -2,7 +2,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { Search, Filter, X } from 'lucide-react'
 import { ArticleCategory } from '@/lib/types'
 

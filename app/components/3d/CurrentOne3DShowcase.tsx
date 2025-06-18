@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useRef, useState, useEffect, useCallback } from 'react'
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
 import * as THREE from 'three'
@@ -36,18 +36,22 @@ function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange
   })
 
   // Optimize materials for performance
-  const optimizeModel = (model: any) => {
-    model.scene.traverse((child: any) => {
-      if (child.isMesh) {
-        child.castShadow = false // Disable shadows for performance
-        child.receiveShadow = false
-        if (child.material) {
-          child.material.transparent = false // Reduce transparency calculations
+  const optimizeModel = useCallback((model: { scene: THREE.Group }) => {
+    model.scene.traverse((child: THREE.Object3D) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        mesh.castShadow = false // Disable shadows for performance
+        mesh.receiveShadow = false
+        if (mesh.material) {
+          const material = mesh.material as THREE.Material
+          if ('transparent' in material) {
+            (material as THREE.MeshBasicMaterial).transparent = false // Reduce transparency calculations
+          }
         }
       }
     })
     return model.scene.clone()
-  }
+  }, [])
 
   return (
     <>

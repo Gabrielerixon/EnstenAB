@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Zap, Shield, Cpu, Star, ArrowRight, Filter, Grid, List, Search } from 'lucide-react'
+import { Zap, ArrowRight, Grid, List, Search } from 'lucide-react'
 import { ProductCategory } from '@/lib/types'
 import { productsData } from '@/lib/products-data'
 

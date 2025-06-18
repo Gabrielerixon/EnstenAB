@@ -13,10 +13,6 @@ import {
   Mail, 
   Shield, 
   Database,
-  Palette,
-  Users,
-  Bell,
-  Key,
   Info
 } from 'lucide-react'
 import { auth } from '@/lib/firebase'
@@ -66,7 +62,7 @@ export default function AdminSettingsPage() {
       await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
       setSaveStatus('success')
       setTimeout(() => setSaveStatus('idle'), 3000)
-    } catch (error) {
+    } catch {
       setSaveStatus('error')
       setTimeout(() => setSaveStatus('idle'), 3000)
     } finally {
