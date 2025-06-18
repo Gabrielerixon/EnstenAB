@@ -17,27 +17,27 @@ export default function BlogPostPage() {
   const [loading, setLoading] = useState(true)
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
 
-  const loadArticle = async () => {
-    try {
-      setLoading(true)
-      const fetchedArticle = await BlogService.getArticle(slug)
-      setArticle(fetchedArticle)
-
-      if (fetchedArticle) {
-        // Load related articles from same category
-        const related = await BlogService.getArticlesByCategory(fetchedArticle.category)
-        setRelatedArticles(related.filter(a => a.id !== fetchedArticle.id).slice(0, 3))
-      }
-    } catch (error) {
-      console.error('Error loading article:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    const loadArticle = async () => {
+      try {
+        setLoading(true)
+        const fetchedArticle = await BlogService.getArticle(slug)
+        setArticle(fetchedArticle)
+
+        if (fetchedArticle) {
+          // Load related articles from same category
+          const related = await BlogService.getArticlesByCategory(fetchedArticle.category)
+          setRelatedArticles(related.filter(a => a.id !== fetchedArticle.id).slice(0, 3))
+        }
+      } catch (error) {
+        console.error('Error loading article:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     loadArticle()
-  }, [slug, loadArticle])
+  }, [slug])
 
   if (loading) {
     return (

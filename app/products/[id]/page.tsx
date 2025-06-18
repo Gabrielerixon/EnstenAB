@@ -165,14 +165,6 @@ export default function ProductPage() {
 
   const activeGalleryItem = galleryItems[activeGalleryIndex]
 
-  // Helper function to get the display name
-  const getItemDisplayName = (item: GalleryItemType): string => {
-    if (item.type === '3d-model') {
-      return item.name
-    }
-    return item.name || item.caption || product.name
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon">
       {/* Background Effects */}

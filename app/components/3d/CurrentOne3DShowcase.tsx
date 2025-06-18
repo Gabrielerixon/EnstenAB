@@ -35,23 +35,7 @@ function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange
     }
   })
 
-  // Optimize materials for performance
-  const optimizeModel = useCallback((model: { scene: THREE.Group }) => {
-    model.scene.traverse((child: THREE.Object3D) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh
-        mesh.castShadow = false // Disable shadows for performance
-        mesh.receiveShadow = false
-        if (mesh.material) {
-          const material = mesh.material as THREE.Material
-          if ('transparent' in material) {
-            (material as THREE.MeshBasicMaterial).transparent = false // Reduce transparency calculations
-          }
-        }
-      }
-    })
-    return model.scene.clone()
-  }, [])
+
 
   return (
     <>

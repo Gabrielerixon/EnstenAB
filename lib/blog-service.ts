@@ -92,16 +92,23 @@ export class BlogService {
     try {
       const docRef = doc(db, COLLECTION_NAME, id)
       
-      const updateData: any = {
-        ...updates,
-        updatedAt: serverTimestamp(),
-      }
-      
+      // Handle publishedAt conversion if needed
       if (updates.publishedAt) {
-        updateData.publishedAt = Timestamp.fromDate(new Date(updates.publishedAt))
+        const { publishedAt, ...restUpdates } = updates
+        const updateData = {
+          ...restUpdates,
+          publishedAt: Timestamp.fromDate(new Date(publishedAt)),
+          updatedAt: serverTimestamp(),
+        }
+        await updateDoc(docRef, updateData)
+      } else {
+        const updateData = {
+          ...updates,
+          updatedAt: serverTimestamp(),
+        }
+        await updateDoc(docRef, updateData)
       }
       
-      await updateDoc(docRef, updateData)
       return true
     } catch (error) {
       console.error('Error updating article:', error)
