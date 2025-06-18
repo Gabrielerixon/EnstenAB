@@ -1,5 +1,5 @@
 // Revised Section.tsx with simplified background approach
-import { forwardRef, HTMLAttributes, ElementType } from 'react'
+import { forwardRef, HTMLAttributes, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
@@ -49,11 +49,12 @@ const sectionVariants = cva(
 export interface SectionProps
   extends HTMLAttributes<HTMLElement>,
     VariantProps<typeof sectionVariants> {
-  as?: ElementType
+  children?: ReactNode
+  containerBackground?: 'default' | 'card' | 'white' | 'dark' | 'none'
 }
 
 export const Section = forwardRef<HTMLElement, SectionProps>(
-  ({ className, background, spacing, container, containerBackground = 'default', as: Component = 'section', children, ...props }, ref) => {
+  ({ className, background, spacing, container, containerBackground = 'default', children, ...props }, ref) => {
     // Simplified container classes logic
     const containerClasses = cn(
       sectionVariants({ container }),
@@ -65,7 +66,7 @@ export const Section = forwardRef<HTMLElement, SectionProps>(
     );
 
     return (
-      <Component
+      <section
         ref={ref}
         className={cn(sectionVariants({ background, spacing }), className)}
         {...props}
@@ -77,7 +78,7 @@ export const Section = forwardRef<HTMLElement, SectionProps>(
         ) : (
           children
         )}
-      </Component>
+      </section>
     )
   }
 )
