@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable} ${orbitron.variable}`}>
       <body className={`${inter.className} relative bg-solar-carbon antialiased`}>
-        {/* Dynamic Background Effects */}
+        {/* Background Effects */}
         <div className="fixed inset-0 z-0 overflow-hidden">
           {/* Base gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon" />
@@ -51,20 +51,23 @@ export default function RootLayout({
           {/* Animated tech grid */}
           <div className="absolute inset-0 tech-grid opacity-10" />
           
-          {/* Energy particles */}
+          {/* FIXED: Static energy particles - no animation, better performance */}
           <div className="absolute inset-0">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 bg-solar-electric rounded-full animate-pulse"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 3}s`,
-                  animationDuration: `${2 + Math.random() * 2}s`,
-                }}
-              />
-            ))}
+            {[...Array(20)].map((_, i) => {
+              // Generate consistent random positions using index as seed
+              const x = ((i * 17) % 100); // Pseudo-random but consistent
+              const y = ((i * 23) % 100);
+              return (
+                <div
+                  key={i}
+                  className="absolute w-1 h-1 bg-solar-electric rounded-full opacity-60"
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                  }}
+                />
+              );
+            })}
           </div>
           
           {/* Ambient glow effects */}

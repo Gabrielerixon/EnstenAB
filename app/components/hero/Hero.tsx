@@ -1,76 +1,24 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { CurrentOne3DShowcase } from '@/components/3d/CurrentOne3DShowcase'
 import Link from 'next/link'
 
 export const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  
-  // Mouse tracking for interactive effects
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect()
-        setMousePosition({
-          x: (e.clientX - rect.left) / rect.width,
-          y: (e.clientY - rect.top) / rect.height,
-        })
-      }
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+  // REMOVED: Mouse tracking - unnecessary and adds overhead
 
   return (
     <div 
       ref={containerRef}
       className="relative min-h-screen overflow-hidden bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon"
     >
-      {/* Animated Background Grid */}
+      {/* Simplified Background Grid */}
       <div className="absolute inset-0 tech-grid opacity-30" />
       
-      {/* Dynamic Energy Lines */}
-      <div className="absolute inset-0">
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute h-px bg-gradient-to-r from-transparent via-solar-electric to-transparent"
-            style={{
-              top: `${20 + i * 10}%`,
-              width: '100%',
-              transform: `translateX(${mousePosition.x * 20 - 10}px)`,
-            }}
-            animate={{
-              opacity: [0.3, 0.8, 0.3],
-              scaleX: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 3 + i * 0.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.2,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Solar Burst Effect */}
-      <motion.div
-        className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full bg-solar-burst opacity-20"
-        animate={{
-          scale: [1, 1.2, 1],
-          rotate: [0, 360],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-      />
+      {/* REMOVED: Dynamic Energy Lines - unnecessary for mobile */}
+      {/* REMOVED: Solar Burst Effect - too expensive */}
 
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen pt-32 pb-32">
@@ -103,18 +51,16 @@ export const Hero = () => {
             <span className="text-solar-gold">for Championship Performance</span>
           </motion.p>
 
-          {/* --- MODIFICATION START --- */}
-          {/* Interactive 3D Model Container - Simplified to allow child to control size */}
+          {/* Interactive 3D Model Container */}
           <motion.div
             initial={{ opacity: 0}}
             animate={{ opacity: 1}}
-            transition={{ duration: 1, delay: 0.4 }}
-            className="relative mx-auto mb-16 w-full" // REMOVED: max-w-[...] h-[...] classes
+            transition={{ duration: 1, delay: 0.8 }}
+            className="relative mx-auto mb-16 w-full"
           >
             <CurrentOne3DShowcase />
-          {/* --- MODIFICATION END --- */}
 
-            {/* Performance Indicators - made more responsive */}
+            {/* Performance Indicators - REMOVED mouse position dependency */}
             <div className="absolute -right-1 md:-right-4 lg:-right-6 top-1/2 transform -translate-y-1/2 z-20">
               <div className="space-y-2">
                 <div className="text-right text-xs text-white/60">PERFORMANCE</div>
@@ -190,7 +136,7 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* Fixed Centered Scroll Indicator - positioned in the breathing room */}
+      {/* Simplified Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
