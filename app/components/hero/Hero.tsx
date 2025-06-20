@@ -98,7 +98,7 @@ export const Hero = () => {
             className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-white/80 mb-12 max-w-4xl mx-auto font-tech"
           >
             Control Your
-            <span className="text-solar-electric font-semibold"> Solar-Powered Car</span>
+            <span className="text-solar-electric font-semibold"> Solar-Powered Car </span>
             <br className="hidden md:block" />
             <span className="text-solar-gold">for Championship Performance</span>
           </motion.p>
@@ -106,8 +106,8 @@ export const Hero = () => {
           {/* --- MODIFICATION START --- */}
           {/* Interactive 3D Model Container - Simplified to allow child to control size */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0}}
+            animate={{ opacity: 1}}
             transition={{ duration: 1, delay: 0.4 }}
             className="relative mx-auto mb-16 w-full" // REMOVED: max-w-[...] h-[...] classes
           >
