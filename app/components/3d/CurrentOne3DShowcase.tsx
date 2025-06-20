@@ -1,3 +1,6 @@
+// app/components/3d/CurrentOne3DShowcase.tsx
+// Replace ONLY the main container div, keep everything else the same
+
 'use client'
 
 import { Suspense, useRef, useState, useEffect, useCallback } from 'react'
@@ -6,20 +9,18 @@ import { useGLTF } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
 import * as THREE from 'three'
 
-// Performance-optimized 3D component
+// Keep ALL your existing model components exactly the same
 function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange: (component: 'steering' | 'control' | 'both') => void }) {
   const groupRef = useRef<THREE.Group>(null!)
   
-  // Load models with error handling using useGLTF from drei
   const controlUnit = useGLTF('/models/current-one/Current One.gltf')
   const steeringWheel = useGLTF('/models/current-one/Ratten.gltf')
   
-  // Faster rotation animation
+  // Keep your EXACT original rotation animation
   useFrame((state) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.15 // Faster rotation
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.15
       
-      // Dynamic component highlighting based on rotation
       const rotationCycle = (state.clock.elapsedTime * 0.15) % (Math.PI * 2)
       let newActiveComponent: 'steering' | 'control' | 'both'
       
@@ -35,11 +36,9 @@ function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange
     }
   })
 
-
-
   return (
     <>
-      {/* Only the smaller brighter circle - removed the larger darker one */}
+      {/* Keep your exact original circle */}
       <mesh position={[0.5, -0.5, -4.8]}>
         <circleGeometry args={[6, 64]} />
         <meshBasicMaterial 
@@ -49,9 +48,8 @@ function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange
         />
       </mesh>
 
-      {/* Entire rotating group - moved left for proper centering */}
+      {/* Keep your exact original group */}
       <group ref={groupRef} position={[0.5, -0.5, -2]}>
-        {/* Steering Wheel - moved further back */}
         <primitive 
           object={steeringWheel.scene.clone()} 
           position={[-0.8, 0.1, -0]}
@@ -59,7 +57,6 @@ function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange
           rotation={[0, Math.PI * 1.5, 0]}
         />
         
-        {/* Control Unit - using your exact specifications */}
         <primitive 
           object={controlUnit.scene.clone()} 
           position={[0.8, -0.1, -4]}
@@ -67,7 +64,6 @@ function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange
           rotation={[0, Math.PI * 0.5, 0]}
         />
         
-        {/* Connection line */}
         <mesh position={[0, 0, -3]}>
           <cylinderGeometry args={[0.03, 0.03, 1.6]} />
           <meshBasicMaterial 
@@ -81,7 +77,7 @@ function CurrentOneModels({ onActiveComponentChange }: { onActiveComponentChange
   )
 }
 
-// Loading fallback component
+// Keep your exact loading component
 function ModelLoader() {
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -95,16 +91,15 @@ function ModelLoader() {
   )
 }
 
-// Preload models for better performance
 useGLTF.preload('/models/current-one/Current One.gltf')
 useGLTF.preload('/models/current-one/Ratten.gltf')
 
-// Main showcase component
+// --- MODIFICATION START ---
+// ONLY change the main component - add size constraints
 export const CurrentOne3DShowcase = () => {
   const [isClient, setIsClient] = useState(false)
   const [activeComponent, setActiveComponent] = useState<'steering' | 'control' | 'both'>('both')
 
-  // Prevent hydration issues with 3D content
   useEffect(() => {
     setIsClient(true)
   }, [])
@@ -113,17 +108,22 @@ export const CurrentOne3DShowcase = () => {
     setActiveComponent(component)
   }, [])
 
+  // Unified container classes to prevent layout shift between loader and canvas
+  const containerClasses = "relative w-full max-w-xl mx-auto aspect-square";
+
   if (!isClient) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl border border-white/20">
+      // Use the same container classes for the loader to reserve the exact space
+      <div className={`${containerClasses} flex items-center justify-center bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl border border-white/20`}>
         <ModelLoader />
       </div>
     )
   }
 
   return (
-    <div className="relative w-full h-full min-w-[500px] min-h-[500px]">
-      {/* 3D Canvas with bigger dimensions and better camera positioning */}
+    // This is the new main container div. It's self-sizing and responsive.
+    <div className={containerClasses}>
+      {/* Canvas now fills the responsive parent */}
       <Canvas
         camera={{ 
           position: [0, 1, 8], 
@@ -138,9 +138,9 @@ export const CurrentOne3DShowcase = () => {
           alpha: true,
           powerPreference: "high-performance"
         }}
-        style={{ width: '100%', height: '100%', minWidth: '500px', minHeight: '500px' }}
+        style={{ width: '100%', height: '100%' }}
       >
-        {/* Brighter enhanced lighting */}
+        {/* Keep your EXACT same lighting */}
         <ambientLight intensity={0.8} />
         <directionalLight 
           position={[5, 5, 5]} 
@@ -157,28 +157,24 @@ export const CurrentOne3DShowcase = () => {
           intensity={0.8} 
           color="#FFB800"
         />
-        {/* Stronger rim lighting from behind */}
         <directionalLight 
           position={[0, 0, -10]} 
           intensity={0.8}
           color="#ffffff"
         />
-        {/* Additional front lighting */}
         <directionalLight 
           position={[0, 5, 10]} 
           intensity={1.0}
           color="#ffffff"
         />
         
-        {/* Models with suspense boundary */}
         <Suspense fallback={null}>
           <CurrentOneModels onActiveComponentChange={handleActiveComponentChange} />
         </Suspense>
       </Canvas>
 
-      {/* Component Labels Overlay */}
+      {/* Keep ALL your exact same overlay components */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Complete System Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -193,7 +189,6 @@ export const CurrentOne3DShowcase = () => {
           </div>
         </motion.div>
 
-        {/* Dynamic Component Labels */}
         <AnimatePresence mode="wait">
           {activeComponent === 'steering' && (
             <motion.div
@@ -232,13 +227,11 @@ export const CurrentOne3DShowcase = () => {
           )}
         </AnimatePresence>
 
-        {/* Tech Frame Corners */}
         <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-solar-electric opacity-60" />
         <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-solar-electric opacity-60" />
         <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-solar-electric opacity-60" />
         <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-solar-electric opacity-60" />
 
-        {/* Scanning Line Effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-b from-transparent via-solar-electric/10 to-transparent h-8 pointer-events-none"
           animate={{ y: [-50, 300] }}
@@ -253,3 +246,4 @@ export const CurrentOne3DShowcase = () => {
     </div>
   )
 }
+// --- MODIFICATION END ---

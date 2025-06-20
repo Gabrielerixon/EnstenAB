@@ -103,14 +103,16 @@ export const Hero = () => {
             <span className="text-solar-gold">for Championship Performance</span>
           </motion.p>
 
-          {/* Interactive 3D Model Container - Made responsive */}
+          {/* --- MODIFICATION START --- */}
+          {/* Interactive 3D Model Container - Simplified to allow child to control size */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="relative mx-auto mb-16 w-full max-w-[500px] h-[400px] md:max-w-[600px] md:h-[500px] lg:max-w-[700px] lg:h-[600px]"
+            className="relative mx-auto mb-16 w-full" // REMOVED: max-w-[...] h-[...] classes
           >
             <CurrentOne3DShowcase />
+          {/* --- MODIFICATION END --- */}
 
             {/* Performance Indicators - made more responsive */}
             <div className="absolute -right-1 md:-right-4 lg:-right-6 top-1/2 transform -translate-y-1/2 z-20">
