@@ -1,6 +1,6 @@
 'use client'
 
-import { Hero } from '@/components/hero/Hero'
+{/*import { Hero } from '@/components/hero/Hero'*/}
 import { motion } from 'framer-motion'
 import { ArrowRight, Zap, Shield, Cpu, Sun } from 'lucide-react'
 import TestimonialsSection from '@/components/sections/TestimonialsSection' 
@@ -39,8 +39,8 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section */}
-      <Hero />
+      {/* Hero <Hero />Section */}
+      
       
       {/* Advanced Technology Section */}
       <section className="relative py-24 bg-gradient-to-b from-solar-carbon to-solar-slate overflow-hidden">
