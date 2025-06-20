@@ -3,7 +3,7 @@
 import { Hero } from '@/components/hero/Hero'
 import { motion } from 'framer-motion'
 import { ArrowRight, Zap, Shield, Cpu, Sun } from 'lucide-react'
-import TestimonialsSection from '@/components/sections/TestimonialsSection'
+{/*import TestimonialsSection from '@/components/sections/TestimonialsSection' */}
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
