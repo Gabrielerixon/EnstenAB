@@ -104,7 +104,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BWSC Challenge Section */}
+      
+
+      {/* BWSC Challenge Section - Mobile Optimized */}
       <section className="relative py-24 bg-gradient-to-r from-solar-slate via-solar-carbon to-solar-slate">
         <div className="absolute inset-0 solar-pattern opacity-10" />
         
@@ -158,304 +160,184 @@ export default function Home() {
               transition={{ duration: 0.8 }}
               className="relative"
             >
-              {/* BWSC Route Visualization - Perfect Curved Map */}
+              {/* MOBILE-OPTIMIZED Route Visualization */}
               <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl border border-white/20 p-8">
                 <div className="aspect-video bg-gradient-to-br from-solar-carbon to-solar-slate rounded-lg overflow-hidden relative">
-                  <svg 
-                    className="w-full h-full" 
-                    viewBox="0 0 400 200" 
-                    preserveAspectRatio="xMidYMid meet"
-                  >
-                    {/* Enhanced Gradient Definitions */}
-                    <defs>
-                      {/* Multi-stop route gradient */}
-                      <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="rgb(0, 212, 255)" />
-                        <stop offset="25%" stopColor="rgb(0, 255, 170)" />
-                        <stop offset="50%" stopColor="rgb(255, 184, 0)" />
-                        <stop offset="75%" stopColor="rgb(255, 120, 0)" />
-                        <stop offset="100%" stopColor="rgb(255, 0, 64)" />
-                      </linearGradient>
-                      
-                      {/* Car glow */}
-                      <radialGradient id="carGlow">
-                        <stop offset="0%" stopColor="rgb(255, 255, 255)" stopOpacity="1" />
-                        <stop offset="50%" stopColor="rgb(0, 212, 255)" stopOpacity="0.8" />
-                        <stop offset="100%" stopColor="rgb(0, 212, 255)" stopOpacity="0" />
-                      </radialGradient>
-                      
-                      {/* Glow effects */}
-                      <filter id="electricGlow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-                        <feMerge> 
-                          <feMergeNode in="coloredBlur"/>
-                          <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                      </filter>
-                      
-                      <filter id="racingGlow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-                        <feMerge> 
-                          <feMergeNode in="coloredBlur"/>
-                          <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                      </filter>
-                    </defs>
-                    
-                    {/* Clean Background Grid */}
-                    <pattern id="cleanGrid" width="25" height="25" patternUnits="userSpaceOnUse">
-                      <path 
-                        d="M 25 0 L 0 0 0 25" 
-                        fill="none" 
-                        stroke="rgba(0, 212, 255, 0.12)" 
-                        strokeWidth="0.5"
+                  
+                  {/* Mobile: Simple Static Version */}
+                  <div className="block md:hidden w-full h-full">
+                    <svg className="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+                      {/* Simple static route line */}
+                      <path
+                        d="M 50 50 C 100 30, 150 20, 200 80 C 250 140, 300 160, 350 130"
+                        stroke="url(#simpleGradient)"
+                        strokeWidth="4"
+                        fill="none"
+                        strokeLinecap="round"
                       />
-                    </pattern>
-                    <rect width="400" height="200" fill="url(#cleanGrid)" />
-                    
-                    {/* Dramatic S-Curve Route like "-x^3 -3x^2 + 2" */}
-                    <motion.path
-                      d="M 50 50 
-                         C 100 30, 150 20, 200 80
-                         C 250 140, 300 160, 350 130"
-                      stroke="url(#routeGradient)"
-                      strokeWidth="6"
-                      fill="none"
-                      strokeDasharray="12,6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      initial={{ pathLength: 0 }}
-                      whileInView={{ pathLength: 1 }}
-                      transition={{ 
-                        duration: 4, 
-                        ease: "easeInOut",
-                        delay: 0.5 
-                      }}
-                      filter="url(#electricGlow)"
-                    />
-                    
-                    {/* Checkpoint waypoints positioned exactly on the curve */}
-                    <motion.circle 
-                      cx="120" cy="35" r="3" 
-                      fill="rgb(255, 184, 0)" 
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ 
-                        scale: [0, 1.2, 1], 
-                        opacity: [0, 1, 0.8] 
-                      }}
-                      transition={{ delay: 1.2, duration: 0.6 }}
-                    />
-                    <motion.circle 
-                      cx="200" cy="80" r="3" 
-                      fill="rgb(255, 184, 0)" 
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ 
-                        scale: [0, 1.2, 1], 
-                        opacity: [0, 1, 0.8] 
-                      }}
-                      transition={{ delay: 1.8, duration: 0.6 }}
-                    />
-                    <motion.circle 
-                      cx="280" cy="140" r="3" 
-                      fill="rgb(255, 184, 0)" 
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ 
-                        scale: [0, 1.2, 1], 
-                        opacity: [0, 1, 0.8] 
-                      }}
-                      transition={{ delay: 2.4, duration: 0.6 }}
-                    />
-                    
-                    {/* Darwin Marker - positioned at path start (50, 50) */}
-                    <motion.g
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.8, duration: 0.8, type: "spring" }}
-                    >
-                      <circle 
-                        cx="50" 
-                        cy="50" 
-                        r="8" 
-                        fill="rgb(0, 212, 255)" 
+                      
+                      <defs>
+                        <linearGradient id="simpleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="rgb(0, 212, 255)" />
+                          <stop offset="50%" stopColor="rgb(255, 184, 0)" />
+                          <stop offset="100%" stopColor="rgb(255, 0, 64)" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Static markers */}
+                      <circle cx="50" cy="50" r="6" fill="rgb(0, 212, 255)" />
+                      <circle cx="50" cy="50" r="3" fill="white" />
+                      <text x="50" y="35" textAnchor="middle" fill="white" fontSize="11" fontFamily="Orbitron">Darwin</text>
+                      
+                      <circle cx="350" cy="130" r="6" fill="rgb(255, 0, 64)" />
+                      <circle cx="350" cy="130" r="3" fill="white" />
+                      <text x="350" y="150" textAnchor="middle" fill="white" fontSize="11" fontFamily="Orbitron">Adelaide</text>
+                      
+                      {/* Static distance box */}
+                      <rect x="130" y="95" width="140" height="40" rx="8" fill="rgba(13, 17, 23, 0.9)" stroke="rgba(255, 184, 0, 0.6)" strokeWidth="1" />
+                      <text x="200" y="112" textAnchor="middle" fill="rgb(255, 184, 0)" fontSize="16" fontWeight="bold" fontFamily="Orbitron">3,000km</text>
+                      <text x="200" y="127" textAnchor="middle" fill="white" fontSize="10" fontFamily="Inter">Race Distance</text>
+                    </svg>
+                  </div>
+
+                  {/* Desktop: Full Animated Version */}
+                  <div className="hidden md:block w-full h-full">
+                    <svg className="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet">
+                      <defs>
+                        <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="rgb(0, 212, 255)" />
+                          <stop offset="25%" stopColor="rgb(0, 255, 170)" />
+                          <stop offset="50%" stopColor="rgb(255, 184, 0)" />
+                          <stop offset="75%" stopColor="rgb(255, 120, 0)" />
+                          <stop offset="100%" stopColor="rgb(255, 0, 64)" />
+                        </linearGradient>
+                        
+                        <filter id="electricGlow" x="-50%" y="-50%" width="200%" height="200%">
+                          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                          <feMerge> 
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
+                        
+                        <pattern id="cleanGrid" width="25" height="25" patternUnits="userSpaceOnUse">
+                          <path d="M 25 0 L 0 0 0 25" fill="none" stroke="rgba(0, 212, 255, 0.12)" strokeWidth="0.5" />
+                        </pattern>
+                      </defs>
+                      
+                      <rect width="400" height="200" fill="url(#cleanGrid)" />
+                      
+                      {/* Animated route */}
+                      <motion.path
+                        d="M 50 50 C 100 30, 150 20, 200 80 C 250 140, 300 160, 350 130"
+                        stroke="url(#routeGradient)"
+                        strokeWidth="6"
+                        fill="none"
+                        strokeDasharray="12,6"
+                        strokeLinecap="round"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        transition={{ duration: 4, ease: "easeInOut", delay: 0.5 }}
                         filter="url(#electricGlow)"
                       />
-                      <circle cx="50" cy="50" r="4" fill="white" />
-                      <motion.circle 
-                        cx="50" 
-                        cy="50" 
-                        r="12" 
-                        fill="none" 
-                        stroke="rgb(0, 212, 255)" 
-                        strokeWidth="1"
-                        strokeOpacity="0.5"
-                        animate={{ r: [12, 16, 12] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      />
-                      <text 
-                        x="50" 
-                        y="32" 
-                        textAnchor="middle" 
-                        fill="white" 
-                        fontSize="13" 
-                        fontWeight="bold"
-                        fontFamily="Orbitron, monospace"
-                      >
-                        Darwin
-                      </text>
-                    </motion.g>
-                    
-                    {/* Adelaide Marker - positioned at path end (350, 130) */}
-                    <motion.g
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 1.0, duration: 0.8, type: "spring" }}
-                    >
-                      <circle 
-                        cx="350" 
-                        cy="130" 
-                        r="8" 
-                        fill="rgb(255, 0, 64)" 
-                        filter="url(#racingGlow)"
-                      />
-                      <circle cx="350" cy="130" r="4" fill="white" />
-                      <motion.circle 
-                        cx="350" 
-                        cy="130" 
-                        r="12" 
-                        fill="none" 
-                        stroke="rgb(255, 0, 64)" 
-                        strokeWidth="1"
-                        strokeOpacity="0.5"
-                        animate={{ r: [12, 16, 12] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                      />
-                      <text 
-                        x="350" 
-                        y="150" 
-                        textAnchor="middle" 
-                        fill="white" 
-                        fontSize="13" 
-                        fontWeight="bold"
-                        fontFamily="Orbitron, monospace"
-                      >
-                        Adelaide
-                      </text>
-                    </motion.g>
-                    
-                    {/* Distance Display - positioned in straight section to avoid curve */}
-                    <motion.g
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.5, duration: 0.8 }}
-                    >
-                      <motion.rect 
-                        x="75" 
-                        y="95" 
-                        width="110" 
-                        height="50" 
-                        rx="12" 
-                        fill="rgba(13, 17, 23, 0.95)" 
-                        stroke="rgba(255, 184, 0, 0.4)" 
-                        strokeWidth="1.5"
-                        animate={{ 
-                          stroke: [
-                            "rgba(255, 184, 0, 0.4)", 
-                            "rgba(0, 212, 255, 0.6)", 
-                            "rgba(255, 184, 0, 0.4)"
-                          ] 
-                        }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                      />
                       
-                      <text 
-                        x="130" 
-                        y="117" 
-                        textAnchor="middle" 
-                        fill="rgb(255, 184, 0)" 
-                        fontSize="18" 
-                        fontWeight="bold"
-                        fontFamily="Orbitron, monospace"
-                      >
-                        3,000km
-                      </text>
-                      
-                      <text 
-                        x="130" 
-                        y="135" 
-                        textAnchor="middle" 
-                        fill="rgba(255, 255, 255, 0.9)" 
-                        fontSize="11"
-                        fontFamily="Inter, system-ui"
-                      >
-                        Race Distance
-                      </text>
-                    </motion.g>
-                    
-                    {/* Racing Car Animation - follows exact path coordinates */}
-                    <motion.g
-                      animate={{ 
-                        x: [50, 120, 200, 280, 350], 
-                        y: [50, 35, 80, 140, 130] 
-                      }}
-                      transition={{ 
-                        duration: 10, 
-                        repeat: Infinity, 
-                        ease: "easeInOut",
-                        delay: 2
-                      }}
-                    >
-                      {/* Speed trail */}
-                      <motion.circle
-                        cx="-8" cy="0" r="3"
-                        fill="rgba(0, 212, 255, 0.3)"
-                        animate={{
-                          opacity: [0.3, 0.1, 0.3],
-                          r: [3, 5, 3]
-                        }}
-                        transition={{ duration: 0.8, repeat: Infinity }}
-                      />
-                      
-                      {/* Main car */}
-                      <circle 
-                        cx="0" 
-                        cy="0" 
-                        r="5" 
-                        fill="url(#carGlow)" 
-                      />
-                      <circle cx="0" cy="0" r="2.5" fill="white" />
-                    </motion.g>
-                    
-                    {/* Finish line celebration sparkles */}
-                    <motion.g
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ 
-                        delay: 8, 
-                        duration: 1.5, 
-                        repeat: Infinity, 
-                        repeatDelay: 8.5 
-                      }}
-                    >
-                      {[...Array(4)].map((_, i) => (
-                        <motion.circle
+                      {/* Animated waypoints */}
+                      {[
+                        { cx: 120, cy: 35, delay: 1.2 },
+                        { cx: 200, cy: 80, delay: 1.8 },
+                        { cx: 280, cy: 140, delay: 2.4 }
+                      ].map((point, i) => (
+                        <motion.circle 
                           key={i}
-                          cx={340 + Math.cos(i * 1.57) * 12}
-                          cy={120 + Math.sin(i * 1.57) * 12}
-                          r="2"
-                          fill={i % 2 ? "rgb(255, 184, 0)" : "rgb(0, 212, 255)"}
-                          animate={{
-                            r: [2, 4, 2],
-                            opacity: [1, 0.4, 1]
-                          }}
-                          transition={{ 
-                            duration: 0.8, 
-                            repeat: Infinity, 
-                            delay: i * 0.15 
-                          }}
+                          cx={point.cx} cy={point.cy} r="3" 
+                          fill="rgb(255, 184, 0)" 
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 0.8] }}
+                          transition={{ delay: point.delay, duration: 0.6 }}
                         />
                       ))}
-                    </motion.g>
-                  </svg>
+                      
+                      {/* Darwin marker with animation */}
+                      <motion.g
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.8, duration: 0.8, type: "spring" }}
+                      >
+                        <circle cx="50" cy="50" r="8" fill="rgb(0, 212, 255)" filter="url(#electricGlow)" />
+                        <circle cx="50" cy="50" r="4" fill="white" />
+                        <motion.circle 
+                          cx="50" cy="50" r="12" fill="none" stroke="rgb(0, 212, 255)" strokeWidth="1" strokeOpacity="0.5"
+                          animate={{ r: [12, 16, 12] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                        <text x="50" y="32" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold" fontFamily="Orbitron">Darwin</text>
+                      </motion.g>
+                      
+                      {/* Adelaide marker with animation */}
+                      <motion.g
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 1.0, duration: 0.8, type: "spring" }}
+                      >
+                        <circle cx="350" cy="130" r="8" fill="rgb(255, 0, 64)" />
+                        <circle cx="350" cy="130" r="4" fill="white" />
+                        <motion.circle 
+                          cx="350" cy="130" r="12" fill="none" stroke="rgb(255, 0, 64)" strokeWidth="1" strokeOpacity="0.5"
+                          animate={{ r: [12, 16, 12] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                        />
+                        <text x="350" y="150" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold" fontFamily="Orbitron">Adelaide</text>
+                      </motion.g>
+                      
+                      {/* Distance display with animation */}
+                      <motion.g
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.5, duration: 0.8 }}
+                      >
+                        <motion.rect 
+                          x="75" y="95" width="110" height="50" rx="12" 
+                          fill="rgba(13, 17, 23, 0.95)" stroke="rgba(255, 184, 0, 0.4)" strokeWidth="1.5"
+                          animate={{ stroke: ["rgba(255, 184, 0, 0.4)", "rgba(0, 212, 255, 0.6)", "rgba(255, 184, 0, 0.4)"] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                        <text x="130" y="117" textAnchor="middle" fill="rgb(255, 184, 0)" fontSize="18" fontWeight="bold" fontFamily="Orbitron">3,000km</text>
+                        <text x="130" y="135" textAnchor="middle" fill="rgba(255, 255, 255, 0.9)" fontSize="11" fontFamily="Inter">Race Distance</text>
+                      </motion.g>
+                      
+                      {/* Racing car animation */}
+                      <motion.g
+                        animate={{ x: [50, 120, 200, 280, 350], y: [50, 35, 80, 140, 130] }}
+                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+                      >
+                        <motion.circle cx="-8" cy="0" r="3" fill="rgba(0, 212, 255, 0.3)"
+                          animate={{ opacity: [0.3, 0.1, 0.3], r: [3, 5, 3] }}
+                          transition={{ duration: 0.8, repeat: Infinity }}
+                        />
+                        <circle cx="0" cy="0" r="5" fill="rgba(255, 255, 255, 0.8)" />
+                        <circle cx="0" cy="0" r="2.5" fill="white" />
+                      </motion.g>
+                      
+                      {/* Finish sparkles */}
+                      <motion.g
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ delay: 8, duration: 1.5, repeat: Infinity, repeatDelay: 8.5 }}
+                      >
+                        {[...Array(4)].map((_, i) => (
+                          <motion.circle
+                            key={i}
+                            cx={340 + Math.cos(i * 1.57) * 12}
+                            cy={120 + Math.sin(i * 1.57) * 12}
+                            r="2"
+                            fill={i % 2 ? "rgb(255, 184, 0)" : "rgb(0, 212, 255)"}
+                            animate={{ r: [2, 4, 2], opacity: [1, 0.4, 1] }}
+                            transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
+                          />
+                        ))}
+                      </motion.g>
+                    </svg>
+                  </div>
                 </div>
                 
                 {/* Stats */}
