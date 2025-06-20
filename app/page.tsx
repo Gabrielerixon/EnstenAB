@@ -413,8 +413,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Add testimonials here */}
-      <TestimonialsSection />
+      {/* Add testimonials here <TestimonialsSection /> */}
+      
 
       {/* CTA Section */}
       <section className="relative py-24 bg-gradient-to-r from-solar-electric via-solar-gold to-solar-racing">
