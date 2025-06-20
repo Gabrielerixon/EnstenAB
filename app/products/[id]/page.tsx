@@ -31,19 +31,31 @@ interface GalleryItemImage {
 
 type GalleryItemType = GalleryItem3D | GalleryItemImage
 
-// Interactive 3D Model Component
+// Interactive 3D Model Component with performance optimizations (GLB format)
 function Interactive3DModel({ modelPath }: { modelPath: string }) {
-  const gltf = useGLTF(modelPath)
+  const gltf = useGLTF(modelPath) // useGLTF works with both .gltf and .glb files
 
   return (
     <primitive object={gltf.scene} scale={[2, 2, 2]} position={[0, 0, 0]} />
   )
 }
 
-// 3D Viewer Component
+// 3D Viewer Component with enhanced performance settings
 function Model3DViewer({ modelPath }: { modelPath: string }) {
+  const [isLoading, setIsLoading] = useState(true)
+
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
+      {/* Loading indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-10">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mb-2" />
+            <span className="text-white text-sm font-tech">Loading 3D Model...</span>
+          </div>
+        </div>
+      )}
+      
       <Canvas
         camera={{ 
           position: [3, 2, 5], 
@@ -51,16 +63,25 @@ function Model3DViewer({ modelPath }: { modelPath: string }) {
           near: 0.1,
           far: 1000
         }}
+        // PERFORMANCE: Optimized settings for better performance
+        dpr={[1, 1.5]} // Limit pixel ratio for performance
+        performance={{ min: 0.8 }} // Maintain 80% performance minimum
+        gl={{ 
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance"
+        }}
         style={{ background: 'transparent' }}
+        onCreated={() => setIsLoading(false)}
       >
-        {/* Lighting */}
-        <ambientLight intensity={0.5} />
+        {/* OPTIMIZED: Lighting setup for better performance */}
+        <ambientLight intensity={0.6} />
         <directionalLight 
           position={[10, 10, 5]} 
-          intensity={1}
-          castShadow
+          intensity={1.2}
+          castShadow={false} // Disabled for performance
         />
-        <pointLight position={[-10, -10, -5]} intensity={0.3} />
+        <pointLight position={[-10, -10, -5]} intensity={0.4} />
         
         <Suspense fallback={null}>
           <Interactive3DModel modelPath={modelPath} />
@@ -73,6 +94,9 @@ function Model3DViewer({ modelPath }: { modelPath: string }) {
           autoRotate={false}
           maxDistance={10}
           minDistance={2}
+          // PERFORMANCE: Reduce rotation dampening for smoother performance
+          enableDamping={true}
+          dampingFactor={0.05}
         />
       </Canvas>
     </div>
@@ -149,7 +173,7 @@ export default function ProductPage() {
   const galleryItems: GalleryItemType[] = [
     ...(product.models3D?.map(model => ({
       type: '3d-model' as const,
-      src: model.path,
+      src: model.path.replace('.gltf', '.glb'), // Convert .gltf paths to .glb
       name: model.name,
       description: model.description,
       alt: `3D Model of ${model.name}`
@@ -210,6 +234,11 @@ export default function ProductPage() {
                         <span>Interactive 3D Model</span>
                       </div>
                       <p className="text-white/70 text-xs mt-1">Click and drag to rotate • Scroll to zoom</p>
+                    </div>
+                    
+                    {/* Performance indicator */}
+                    <div className="absolute top-4 right-4 bg-green-600/80 backdrop-blur-sm rounded-lg px-2 py-1">
+                      <span className="text-white text-xs font-tech">Optimized GLB</span>
                     </div>
                   </div>
                 ) : (
@@ -410,7 +439,7 @@ export default function ProductPage() {
                       { name: 'Technical Specifications', size: '2.3 MB', format: 'PDF' },
                       { name: 'Installation Guide', size: '4.1 MB', format: 'PDF' },
                       { name: 'Software Package', size: '15.2 MB', format: 'ZIP' },
-                      { name: '3D CAD Files', size: '8.7 MB', format: 'STEP' }
+                      { name: '3D CAD Files (GLB Format)', size: '1.2 MB', format: 'GLB' }
                     ].map((download, index) => (
                       <div key={index} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-colors">
                         <div>

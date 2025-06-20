@@ -42,8 +42,9 @@ function CurrentOneModels({
 }) {
   const groupRef = useRef<THREE.Group>(null!)
   
-  const controlUnit = useGLTF('/models/current-one/Current One.gltf')
-  const steeringWheel = useGLTF('/models/current-one/Ratten.gltf')
+  // UPDATED: Using compressed .glb files instead of .gltf + .bin
+  const controlUnit = useGLTF('/models/current-one/Current One.glb')
+  const steeringWheel = useGLTF('/models/current-one/Ratten.glb')
   
   // PERFORMANCE: Reduce animation frequency on low-end devices
   const rotationSpeed = isLowEnd ? 0.05 : 0.15
@@ -143,9 +144,9 @@ function MobileFallback() {
   )
 }
 
-// Preload models
-useGLTF.preload('/models/current-one/Current One.gltf')
-useGLTF.preload('/models/current-one/Ratten.gltf')
+// UPDATED: Preload compressed .glb files
+useGLTF.preload('/models/current-one/Current One.glb')
+useGLTF.preload('/models/current-one/Ratten.glb')
 
 // MAIN COMPONENT: Performance-aware
 export const CurrentOne3DShowcase = () => {
