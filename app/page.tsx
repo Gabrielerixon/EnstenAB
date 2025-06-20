@@ -3,7 +3,7 @@
 import { Hero } from '@/components/hero/Hero'
 import { motion } from 'framer-motion'
 import { ArrowRight, Zap, Shield, Cpu, Sun } from 'lucide-react'
-{/*import TestimonialsSection from '@/components/sections/TestimonialsSection' */}
+import TestimonialsSection from '@/components/sections/TestimonialsSection' 
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
@@ -413,8 +413,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Add testimonials here <TestimonialsSection /> */}
-      
+      {/* Add testimonials here  */}
+      <TestimonialsSection />
 
       {/* CTA Section */}
       <section className="relative py-24 bg-gradient-to-r from-solar-electric via-solar-gold to-solar-racing">
