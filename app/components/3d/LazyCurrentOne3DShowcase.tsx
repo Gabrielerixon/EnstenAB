@@ -5,7 +5,7 @@ import { Suspense, useRef, useState, useEffect, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Box, Loader } from 'lucide-react'
+import { Play, Loader } from 'lucide-react'
 import Image from 'next/image'
 import * as THREE from 'three'
 
