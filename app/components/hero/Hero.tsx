@@ -20,16 +20,22 @@ export const Hero = () => {
       <div className="relative z-10 flex items-center justify-center min-h-screen pt-32 pb-32">
         <div className="container mx-auto px-4 md:px-6 text-center">
           
-          {/* Main Heading with Animation */}
+          {/* Main Heading with Animation - FIXED MOBILE TEXT HIERARCHY */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8"
           >
-            <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-racing font-black text-white mb-4">
-              <span className="block">ENSTEN AB</span>
-              <span className="block text-gradient text-3xl md:text-4xl lg:text-5xl xl:text-6xl">RACING TECHNOLOGY</span>
+            <h1 className="font-racing font-black text-white mb-4">
+              {/* ENSTEN AB - Always the dominant/larger text */}
+              <span className="block text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+                ENSTEN AB
+              </span>
+              {/* RACING TECHNOLOGY - Always smaller than ENSTEN AB */}
+              <span className="block text-gradient text-2xl md:text-4xl lg:text-5xl xl:text-6xl">
+                RACING TECHNOLOGY
+              </span>
             </h1>
             <div className="h-1 w-32 bg-solar-gradient mx-auto mb-8 rounded-full" />
           </motion.div>
@@ -87,9 +93,6 @@ export const Hero = () => {
                 </div>
               </div>
             </div>
-
-            {/* NEW: Performance Achievement Badge */}
-            
           </motion.div>
 
           {/* CTA Buttons */}

@@ -1,4 +1,4 @@
-// app/contact/page.tsx - COMPLETE FIXED VERSION
+// app/contact/page.tsx - UPDATED WITH OSKAR OGARP
 'use client'
 
 import { useState } from 'react'
@@ -16,9 +16,17 @@ import { Button } from '@/components/common/Button'
 import Link from 'next/link'
 import Image from 'next/image'
 
-
-// Team members data
+// Team members data - UPDATED WITH OSKAR OGARP
 const teamMembers = [
+  {
+    id: 'oskar-ogarp',
+    name: 'Oskar Ogarp',
+    role: 'Client Relations Manager',
+    bio: 'Leading client communications and business development initiatives. Connects teams with the perfect technology solutions for their solar racing projects.',
+    image: '/images/team/oskar-ogarp.jpg',
+    email: 'oskar@ensten.org',
+    linkedin: 'https://www.linkedin.com/in/oskarogarp/'
+  },
   {
     id: 'erik-tornqvist',
     name: 'Erik Törnqvist',
@@ -340,7 +348,7 @@ export default function ContactPage() {
                     <div>
                       <p className="text-white font-tech font-semibold">Phone</p>
                       <a href="tel:+46123456789" className="text-solar-electric hover:text-solar-gold transition-colors font-tech">
-                        +46 123 456 789
+                        +46 762 972 180
                       </a>
                     </div>
                   </div>
@@ -388,7 +396,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Team Section - FIXED WITH LARGER IMAGES */}
+      {/* Team Section - WITH OSKAR OGARP ADDED */}
       <section className="relative py-24 bg-gradient-to-r from-solar-slate/50 to-solar-carbon/50">
         <div className="container mx-auto px-6">
           <motion.div
@@ -401,20 +409,21 @@ export default function ContactPage() {
               MEET OUR <span className="text-gradient">ENGINEERING TEAM</span>
             </h2>
             <p className="text-xl text-white/80 max-w-3xl mx-auto font-tech">
-              World-class engineers dedicated to advancing solar racing technology
+              World-class engineers and client relations experts dedicated to advancing solar racing technology
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Updated grid to handle 5 members better */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 max-w-7xl mx-auto">
             {teamMembers.map((member, index) => (
               <motion.div
                 key={member.id}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6 text-center hover:border-white/40 transition-all duration-300 card-hover"
               >
-                {/* BIGGER Profile Images - Updated from w-24 h-24 to w-32 h-32 */}
+                {/* Profile Images */}
                 <div className="w-32 h-32 rounded-full mx-auto mb-4 overflow-hidden border-2 border-solar-electric/50 relative">
                   <Image
                     src={member.image}
@@ -430,7 +439,7 @@ export default function ContactPage() {
                       if (parent) {
                         parent.innerHTML = `
                           <div class="w-full h-full bg-solar-gradient rounded-full flex items-center justify-center">
-                            <span class="text-white font-racing font-bold text-3xl">
+                            <span class="text-white font-racing font-bold text-2xl">
                               ${member.name.split(' ').map(n => n[0]).join('')}
                             </span>
                           </div>
@@ -440,33 +449,33 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <h3 className="text-xl font-racing font-bold text-white mb-2">
+                <h3 className="text-lg font-racing font-bold text-white mb-2">
                   {member.name}
                 </h3>
                 
-                <p className="text-solar-electric font-tech font-semibold mb-3">
+                <p className="text-solar-electric font-tech font-semibold mb-3 text-sm">
                   {member.role}
                 </p>
                 
-                <p className="text-white/80 font-tech text-sm mb-6 leading-relaxed">
+                <p className="text-white/80 font-tech text-xs mb-6 leading-relaxed">
                   {member.bio}
                 </p>
 
                 {/* Contact Links */}
-                <div className="flex justify-center gap-4">
+                <div className="flex justify-center gap-3">
                   <a
                     href={`mailto:${member.email}`}
-                    className="flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-solar-electric rounded-lg transition-colors group"
+                    className="flex items-center justify-center w-8 h-8 bg-white/10 hover:bg-solar-electric rounded-lg transition-colors group"
                   >
-                    <Mail className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                    <Mail className="w-3 h-3 text-white group-hover:scale-110 transition-transform" />
                   </a>
                   <a
                     href={member.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center w-10 h-10 bg-white/10 hover:bg-solar-electric rounded-lg transition-colors group"
+                    className="flex items-center justify-center w-8 h-8 bg-white/10 hover:bg-solar-electric rounded-lg transition-colors group"
                   >
-                    <Linkedin className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+                    <Linkedin className="w-3 h-3 text-white group-hover:scale-110 transition-transform" />
                   </a>
                 </div>
               </motion.div>

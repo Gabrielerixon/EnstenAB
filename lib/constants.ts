@@ -7,7 +7,7 @@ export const SITE_CONFIG = {
   description: 'Advanced control units and components for solar racing vehicles. Empowering teams to achieve peak performance in the Bridgestone World Solar Challenge.',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://ensten.org',
   email: 'info@ensten.org',
-  phone: '+46 123 456 789', // Update this with actual phone number
+  phone: '+46 762 972 180', // Update this with actual phone number
   address: {
     street: 'Thorildsgatan 10',
     city: 'Jönköping',

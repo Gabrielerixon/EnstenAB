@@ -8,7 +8,7 @@ export const productsData: Product[] = [
     tagline: 'The Ultimate Solar Racing Control Unit',
     description: 'Professional-grade control unit designed specifically for solar racing vehicles competing in the Bridgestone World Solar Challenge. Features advanced real-time processing, military-grade protection, and seamless CAN bus integration.',
     shortDescription: 'Professional-grade control unit for championship solar racing performance.',
-    modelPath: '/models/current-one/Current One.gltf',
+    modelPath: '/models/current-one/Current One.glb',
     thumbnailPath: '/images/products/current-one/currentOne.png',
     features: [
       {
@@ -58,12 +58,12 @@ export const productsData: Product[] = [
     availability: 'pre-order',
     models3D: [
       {
-        path: '/models/current-one/Current One.gltf',
+        path: '/models/current-one/Current One.glb',
         name: 'Control Unit',
         description: 'Main control unit housing'
       },
       {
-        path: '/models/current-one/Ratten.gltf', 
+        path: '/models/current-one/Ratten.glb', 
         name: 'Steering Wheel Interface',
         description: 'Driver control interface'
       }
@@ -75,7 +75,7 @@ export const productsData: Product[] = [
     tagline: 'High-Efficiency Solar Panel System',
     description: 'Advanced solar panel system designed for maximum energy harvesting in racing conditions. Features industry-leading efficiency and lightweight construction optimized for competitive solar vehicles.',
     shortDescription: 'High-efficiency solar panel system for optimal energy harvesting.',
-    modelPath: '/models/current-one/solpanel.gltf',
+    modelPath: '/models/current-one/solpanel.glb',
     thumbnailPath: '/images/products/solar-panel/Solpanel/solarmodule.jpg',
     features: [
       {
@@ -133,7 +133,7 @@ export const productsData: Product[] = [
     availability: 'available',
     models3D: [
       {
-        path: '/models/current-one/solpanel.gltf',
+        path: '/models/current-one/solpanel.glb',
         name: 'Solar Panel',
         description: 'Complete solar panel assembly'
       }
@@ -145,7 +145,7 @@ export const productsData: Product[] = [
     tagline: 'Advanced CAN Bus Communication System',
     description: 'Sophisticated CAN bus converter system designed for seamless communication between vehicle subsystems. Enables reliable data exchange and system integration for solar racing vehicles.',
     shortDescription: 'Advanced CAN bus converter for seamless system communication.',
-    modelPath: '',
+    modelPath: '/models/current-one/Cansuba.glb',
     thumbnailPath: '/images/products/cansuba/cansuba.png',
     features: [
       {
@@ -191,7 +191,13 @@ export const productsData: Product[] = [
     category: 'accessory',
     price: 'Contact for Pricing', 
     availability: 'available',
-    models3D: []
+    models3D: [
+      {
+        path: '/models/current-one/Cansuba.glb',
+        name: 'Cansuba Converter',
+        description: 'Complete CAN bus converter unit'
+      }
+    ]
   }
 ]
 

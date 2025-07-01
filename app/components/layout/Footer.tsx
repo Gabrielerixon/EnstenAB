@@ -99,9 +99,23 @@ export const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-gray-800 text-gray-400 text-sm">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p>&copy; {new Date().getFullYear()} Ensten AB. All rights reserved.</p>
-            <div className="mt-4 md:mt-0">
-              <Link href="/privacy" className="mr-4 hover:text-white transition-colors">Privacy Policy</Link>
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <p>&copy; {new Date().getFullYear()} Ensten AB. All rights reserved.</p>
+              {/* NEW: Created by Eriksson G AB */}
+              <p className="text-gray-500">
+                Created by{' '}
+                <a 
+                  href="https://erikssongab.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-solar-electric hover:text-solar-gold transition-colors font-medium"
+                >
+                  Eriksson G AB
+                </a>
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0 flex gap-4">
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
             </div>
           </div>

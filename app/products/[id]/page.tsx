@@ -1,4 +1,4 @@
-// app/products/[id]/page.tsx
+// app/products/[id]/page.tsx - IMPROVED 3D MODEL DISPLAY
 'use client'
 
 import { useState, Suspense } from 'react'
@@ -26,62 +26,109 @@ interface GalleryItemImage {
   src: string
   alt: string
   caption?: string
-  name?: string // Made optional to match 3D models
+  name?: string
 }
 
 type GalleryItemType = GalleryItem3D | GalleryItemImage
 
-// Interactive 3D Model Component with performance optimizations (GLB format)
+// Interactive 3D Model Component with MUCH BIGGER scaling and proper orientation
 function Interactive3DModel({ modelPath }: { modelPath: string }) {
-  const gltf = useGLTF(modelPath) // useGLTF works with both .gltf and .glb files
+  const gltf = useGLTF(modelPath)
+
+  // MUCH BIGGER: Scale up significantly for proper visibility
+  let scale = [20, 20, 20] // Massively increased from [4, 4, 4] to [15, 15, 15]
+  
+  // Handle specific model orientations
+  let rotation = [0, 0, 0]
+  if (modelPath.includes('solpanel')) {
+    // Rotate solar panel so it displays face-up instead of face-down
+    scale = [12, 12, 12]
+    rotation = [Math.PI, 0, 0] // 180 degrees rotation around X-axis
+  }
 
   return (
-    <primitive object={gltf.scene} scale={[2, 2, 2]} position={[0, 0, 0]} />
+    <primitive 
+      object={gltf.scene} 
+      scale={scale}
+      position={[0, 0, 0]}
+      rotation={rotation}
+    />
   )
 }
 
-// 3D Viewer Component with enhanced performance settings
+// 3D Viewer Component with WHITE BACKGROUND and enhanced lighting
 function Model3DViewer({ modelPath }: { modelPath: string }) {
   const [isLoading, setIsLoading] = useState(true)
 
   return (
     <div className="w-full h-full relative">
-      {/* Loading indicator */}
+      {/* Loading indicator - FIXED for white background */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-sm z-10 rounded-2xl">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mb-2" />
-            <span className="text-white text-sm font-tech">Loading 3D Model...</span>
+            <div className="w-12 h-12 border-4 border-solar-electric/20 border-t-solar-electric rounded-full animate-spin mb-2" />
+            <span className="text-solar-carbon text-sm font-tech font-semibold">Loading 3D Model...</span>
           </div>
         </div>
       )}
       
       <Canvas
         camera={{ 
-          position: [3, 2, 5], 
-          fov: 50,
+          position: [8, 5, 12], // Moved camera further back for much larger models
+          fov: 45,
           near: 0.1,
           far: 1000
         }}
-        // PERFORMANCE: Optimized settings for better performance
-        dpr={[1, 1.5]} // Limit pixel ratio for performance
-        performance={{ min: 0.8 }} // Maintain 80% performance minimum
+        dpr={[1, 1.5]}
+        performance={{ min: 0.8 }}
         gl={{ 
           antialias: true,
-          alpha: true,
+          alpha: false, // Disabled alpha for solid white background
           powerPreference: "high-performance"
         }}
-        style={{ background: 'transparent' }}
-        onCreated={() => setIsLoading(false)}
+        style={{ 
+          background: '#ffffff', // WHITE BACKGROUND instead of transparent
+          borderRadius: '1rem'
+        }}
+        onCreated={({ gl }) => {
+          gl.setClearColor('#ffffff', 1) // Ensure white background
+          setIsLoading(false)
+        }}
       >
-        {/* OPTIMIZED: Lighting setup for better performance */}
-        <ambientLight intensity={0.6} />
+        {/* IMPROVED LIGHTING FOR WHITE BACKGROUND */}
+        <color attach="background" args={['#ffffff']} />
+        
+        {/* Studio lighting setup for white background */}
+        <ambientLight intensity={0.4} color="#ffffff" />
+        
+        {/* Key light - main illumination */}
         <directionalLight 
-          position={[10, 10, 5]} 
-          intensity={1.2}
-          castShadow={false} // Disabled for performance
+          position={[10, 10, 8]} 
+          intensity={1.5}
+          color="#ffffff"
+          castShadow={false}
         />
-        <pointLight position={[-10, -10, -5]} intensity={0.4} />
+        
+        {/* Fill light - reduces harsh shadows */}
+        <directionalLight 
+          position={[-8, 5, 6]} 
+          intensity={0.8}
+          color="#f8f9fa"
+        />
+        
+        {/* Rim light - adds definition */}
+        <directionalLight 
+          position={[0, -5, -10]} 
+          intensity={0.6}
+          color="#e9ecef"
+        />
+        
+        {/* Top light for better overall illumination */}
+        <directionalLight 
+          position={[0, 15, 0]} 
+          intensity={0.7}
+          color="#ffffff"
+        />
         
         <Suspense fallback={null}>
           <Interactive3DModel modelPath={modelPath} />
@@ -92,9 +139,8 @@ function Model3DViewer({ modelPath }: { modelPath: string }) {
           enableZoom={true}
           enableRotate={true}
           autoRotate={false}
-          maxDistance={10}
-          minDistance={2}
-          // PERFORMANCE: Reduce rotation dampening for smoother performance
+          maxDistance={25} // Increased for much larger models
+          minDistance={5} // Increased for much larger models
           enableDamping={true}
           dampingFactor={0.05}
         />
@@ -169,11 +215,11 @@ export default function ProductPage() {
     )
   }
 
-  // Create gallery items from both 3D models and images with proper typing
+  // Create gallery items from both 3D models and images
   const galleryItems: GalleryItemType[] = [
     ...(product.models3D?.map(model => ({
       type: '3d-model' as const,
-      src: model.path.replace('.gltf', '.glb'), // Convert .gltf paths to .glb
+      src: model.path,
       name: model.name,
       description: model.description,
       alt: `3D Model of ${model.name}`
@@ -183,7 +229,7 @@ export default function ProductPage() {
       src: image.src,
       alt: image.alt,
       caption: image.caption,
-      name: image.caption || product.name // Use caption as name fallback
+      name: image.caption || product.name
     }))
   ]
 
@@ -227,18 +273,18 @@ export default function ProductPage() {
                       modelPath={activeGalleryItem.src}
                     />
                     
-                    {/* 3D Controls Overlay */}
-                    <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2">
-                      <div className="flex items-center text-white text-sm font-tech">
-                        <Box className="w-4 h-4 mr-2" />
+                    {/* 3D Controls Overlay - FIXED with dark text for white background */}
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-solar-electric/30 shadow-lg">
+                      <div className="flex items-center text-solar-carbon text-sm font-tech font-semibold">
+                        <Box className="w-4 h-4 mr-2 text-solar-electric" />
                         <span>Interactive 3D Model</span>
                       </div>
-                      <p className="text-white/70 text-xs mt-1">Click and drag to rotate • Scroll to zoom</p>
+                      <p className="text-solar-carbon/80 text-xs mt-1">Click and drag to rotate • Scroll to zoom</p>
                     </div>
                     
-                    {/* Performance indicator */}
-                    <div className="absolute top-4 right-4 bg-green-600/80 backdrop-blur-sm rounded-lg px-2 py-1">
-                      <span className="text-white text-xs font-tech">Optimized GLB</span>
+                    {/* Enhanced model indicator - FIXED for white background */}
+                    <div className="absolute top-4 right-4 bg-green-600 backdrop-blur-sm rounded-lg px-3 py-1 border border-green-400/30 shadow-lg">
+                      <span className="text-white text-xs font-tech font-semibold">Enhanced 3D View</span>
                     </div>
                   </div>
                 ) : (
@@ -330,12 +376,16 @@ export default function ProductPage() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
+                  <Link href="/contact">
                   <Button variant="primary" fullWidth>
                     Request Quote
                   </Button>
+                  </Link>
+                  <Link href="/contact">
                   <Button variant="outline" fullWidth>
                     Contact Engineer
                   </Button>
+                  </Link>
                 </div>
               </div>
 
@@ -434,12 +484,11 @@ export default function ProductPage() {
                 <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-8">
                   <h2 className="text-2xl font-racing font-bold text-white mb-6">Downloads & Resources</h2>
                   <div className="grid md:grid-cols-2 gap-4">
-                    {/* Mock downloads - you can customize these per product */}
                     {[
                       { name: 'Technical Specifications', size: '2.3 MB', format: 'PDF' },
                       { name: 'Installation Guide', size: '4.1 MB', format: 'PDF' },
                       { name: 'Software Package', size: '15.2 MB', format: 'ZIP' },
-                      { name: '3D CAD Files (GLB Format)', size: '1.2 MB', format: 'GLB' }
+                      { name: '3D Model Files', size: '3.2 MB', format: 'GLB' }
                     ].map((download, index) => (
                       <div key={index} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-colors">
                         <div>
