@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
                   <div>
                     <p className="text-sm text-white/60 mb-4">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     <p className="text-lg mb-6">
-                      These Terms of Service ("Terms") govern your use of the Ensten AB website and services. By accessing or using our services, you agree to be bound by these Terms.
+                      These Terms of Service (&quot;Terms&quot;) govern your use of the Ensten AB website and services. By accessing or using our services, you agree to be bound by these Terms.
                     </p>
                   </div>
 
@@ -162,7 +162,7 @@ export default function TermsOfServicePage() {
                       <div>
                         <h3 className="text-lg font-semibold text-solar-electric mb-2">Service Disclaimer:</h3>
                         <p>
-                          The information on this website is provided on an "as is" basis. To the fullest extent permitted by law, Ensten AB disclaims all warranties, either express or implied, including but not limited to implied warranties of merchantability and fitness for a particular purpose.
+                          The information on this website is provided on an &quot;as is&quot; basis. To the fullest extent permitted by law, Ensten AB disclaims all warranties, either express or implied, including but not limited to implied warranties of merchantability and fitness for a particular purpose.
                         </p>
                       </div>
                       <div>
@@ -187,7 +187,7 @@ export default function TermsOfServicePage() {
                       These Terms of Service are governed by and construed in accordance with the laws of Sweden. Any disputes arising under these terms shall be subject to the exclusive jurisdiction of the Swedish courts.
                     </p>
                     <p>
-                      The European Union's Online Dispute Resolution platform is available at: http://ec.europa.eu/consumers/odr/
+                      The European Union&apos;s Online Dispute Resolution platform is available at: http://ec.europa.eu/consumers/odr/
                     </p>
                   </div>
 

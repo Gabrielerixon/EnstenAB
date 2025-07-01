@@ -70,7 +70,7 @@ export default function PrivacyPolicyPage() {
                   <div>
                     <p className="text-sm text-white/60 mb-4">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     <p className="text-lg mb-6">
-                      This Privacy Policy describes how Ensten AB ("we," "us," or "our") collects, uses, and protects your personal information when you visit our website or use our services.
+                      This Privacy Policy describes how Ensten AB (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) collects, uses, and protects your personal information when you visit our website or use our services.
                     </p>
                   </div>
 
