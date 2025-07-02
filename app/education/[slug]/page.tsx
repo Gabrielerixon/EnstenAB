@@ -1,4 +1,4 @@
-// app/education/[slug]/page.tsx - FIXED with better error handling
+// app/education/[slug]/page.tsx - FIXED with better error handling - FIXED ESLint errors
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -109,7 +109,7 @@ export default function BlogPostPage() {
             <p className="text-white/60 font-tech text-sm">
               <strong>Debug info:</strong><br />
               Requested slug: <code>{slug}</code><br />
-              This usually happens when the article ID doesn't match the URL format.
+              This usually happens when the article ID doesn&apos;t match the URL format.
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function BlogPostPage() {
         <div className="text-center text-white">
           <BookOpen className="w-16 h-16 text-white/60 mx-auto mb-4" />
           <h1 className="text-2xl font-racing font-bold mb-2">Article Not Found</h1>
-          <p className="text-white/70 font-tech mb-6">The article you're looking for doesn't exist.</p>
+          <p className="text-white/70 font-tech mb-6">The article you&apos;re looking for doesn&apos;t exist.</p>
           <Link href="/education">
             <button className="btn-primary px-6 py-3 rounded-lg font-tech font-semibold">
               Back to Education

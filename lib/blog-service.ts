@@ -1,10 +1,9 @@
-// lib/blog-service.ts - FIXED VERSION with better error handling
+// lib/blog-service.ts - FIXED VERSION with better error handling - FIXED ESLint errors
 import { 
   collection, 
   doc, 
   getDocs, 
   getDoc, 
-  addDoc, 
   updateDoc, 
   deleteDoc, 
   query, 
@@ -18,6 +17,13 @@ import { db } from './firebase'
 import { Article } from './types'
 
 const COLLECTION_NAME = 'articles'
+
+// Interface for update data to replace 'any' type
+interface UpdateData {
+  [key: string]: unknown
+  updatedAt?: ReturnType<typeof serverTimestamp>
+  publishedAt?: Timestamp | string
+}
 
 export class BlogService {
   
@@ -105,7 +111,7 @@ export class BlogService {
     }
   }
 
-  // Update article - FIXED with better error handling
+  // Update article - FIXED with better error handling and type safety
   static async updateArticle(id: string, updates: Partial<Article>): Promise<boolean> {
     try {
       console.log('✏️ Updating article with ID:', id)
@@ -120,8 +126,8 @@ export class BlogService {
         throw new Error(`Article with ID ${id} does not exist`)
       }
       
-      // Prepare update data
-      const updateData: any = {
+      // Prepare update data with proper typing
+      const updateData: UpdateData = {
         ...updates,
         updatedAt: serverTimestamp(),
       }

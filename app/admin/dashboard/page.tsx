@@ -13,7 +13,6 @@ import {
   Users, 
   Settings, 
   Mail, 
-  TrendingUp,
   LogOut,
   Plus,
   Eye,

@@ -1,4 +1,4 @@
-// app/admin/utilities/page.tsx - ENHANCED with debug functions
+// app/admin/utilities/page.tsx - ENHANCED with debug functions - FIXED ESLint errors
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -49,8 +49,8 @@ export default function AdminUtilitiesPage() {
         setIsLoadingCount(true)
         const count = await BlogService.getArticleCount()
         setArticleCount(count)
-      } catch (error) {
-        console.error('Error loading article count:', error)
+      } catch (err) {
+        console.error('Error loading article count:', err)
         setMessage({ type: 'error', text: 'Failed to load article count' })
       } finally {
         setIsLoadingCount(false)
@@ -68,7 +68,8 @@ export default function AdminUtilitiesPage() {
       const count = await BlogService.getArticleCount()
       setArticleCount(count)
       setMessage({ type: 'success', text: `Refreshed: Found ${count} articles` })
-    } catch (error) {
+    } catch (err) {
+      console.error('Error refreshing count:', err)
       setMessage({ type: 'error', text: 'Failed to refresh count' })
     } finally {
       setIsLoadingCount(false)
@@ -85,9 +86,9 @@ export default function AdminUtilitiesPage() {
       
       // Refresh article count
       await refreshCount()
-    } catch (error) {
-      console.error('Seeding error:', error)
-      setMessage({ type: 'error', text: `Failed to seed articles: ${error}` })
+    } catch (err) {
+      console.error('Seeding error:', err)
+      setMessage({ type: 'error', text: `Failed to seed articles: ${err}` })
     } finally {
       setIsSeeding(false)
     }
@@ -111,9 +112,9 @@ export default function AdminUtilitiesPage() {
       await clearAllArticles()
       setMessage({ type: 'success', text: 'All articles cleared successfully!' })
       setArticleCount(0)
-    } catch (error) {
-      console.error('Clearing error:', error)
-      setMessage({ type: 'error', text: `Failed to clear articles: ${error}` })
+    } catch (err) {
+      console.error('Clearing error:', err)
+      setMessage({ type: 'error', text: `Failed to clear articles: ${err}` })
     } finally {
       setIsClearing(false)
     }
@@ -140,9 +141,9 @@ export default function AdminUtilitiesPage() {
       
       setDebugInfo(debugOutput)
       setMessage({ type: 'success', text: 'Debug information collected. Check the output below.' })
-    } catch (error) {
-      console.error('Debug error:', error)
-      setMessage({ type: 'error', text: `Debug failed: ${error}` })
+    } catch (err) {
+      console.error('Debug error:', err)
+      setMessage({ type: 'error', text: `Debug failed: ${err}` })
     } finally {
       setIsDebugging(false)
     }
@@ -313,7 +314,7 @@ export default function AdminUtilitiesPage() {
                   <div>
                     <h3 className="text-white font-tech font-semibold mb-1">Debug Database</h3>
                     <p className="text-blue-300 text-sm font-tech">
-                      See what's actually in your Firestore database
+                      See what&apos;s actually in your Firestore database
                     </p>
                   </div>
                   <Bug className="w-5 h-5 text-blue-400 mt-1" />
@@ -393,7 +394,7 @@ export default function AdminUtilitiesPage() {
                   <span className="text-solar-electric font-bold text-xs">1</span>
                 </div>
                 <p>
-                  <strong>If articles won't delete/edit:</strong> Click "Debug Database" to see what's actually stored, 
+                  <strong>If articles won&apos;t delete/edit:</strong> Click &quot;Debug Database&quot; to see what&apos;s actually stored, 
                   then compare the IDs shown in the admin panel.
                 </p>
               </div>
@@ -402,7 +403,7 @@ export default function AdminUtilitiesPage() {
                   <span className="text-solar-electric font-bold text-xs">2</span>
                 </div>
                 <p>
-                  <strong>If you have broken articles:</strong> Use "Clear All Articles" and then "Seed Articles" 
+                  <strong>If you have broken articles:</strong> Use &quot;Clear All Articles&quot; and then &quot;Seed Articles&quot; 
                   to start fresh with working content.
                 </p>
               </div>

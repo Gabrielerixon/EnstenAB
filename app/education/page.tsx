@@ -249,7 +249,7 @@ export default function EducationPage() {
                   </div>
                   <h3 className="text-xl font-racing font-bold text-white mb-3">No Articles Yet</h3>
                   <p className="text-white/60 font-tech mb-6">
-                    Articles haven't been added to the database yet. Check the admin panel to add content.
+                    Articles haven&apos;t been added to the database yet. Check the admin panel to add content.
                   </p>
                   <Link href="/admin/blog">
                     <button className="btn-primary px-6 py-3 rounded-lg font-tech font-semibold">
