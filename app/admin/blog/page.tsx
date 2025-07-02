@@ -1,4 +1,4 @@
-// app/admin/blog/page.tsx - Enhanced Blog Management Interface
+// app/admin/blog/page.tsx - FIXED VERSION with working delete and error handling
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -18,7 +18,8 @@ import {
   ArrowLeft,
   Clock,
   User,
-  FileText
+  FileText,
+  AlertCircle
 } from 'lucide-react'
 import { auth } from '@/lib/firebase'
 import { BlogService } from '@/lib/blog-service'
@@ -45,6 +46,8 @@ export default function BlogAdminPage() {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   // Redirect if not authenticated
@@ -83,10 +86,13 @@ export default function BlogAdminPage() {
   const loadArticles = async () => {
     try {
       setIsLoading(true)
+      setError(null)
       const fetchedArticles = await BlogService.getArticles()
+      console.log('Loaded articles:', fetchedArticles) // Debug log
       setArticles(fetchedArticles)
     } catch (error) {
       console.error('Error loading articles:', error)
+      setError('Failed to load articles. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -108,8 +114,23 @@ export default function BlogAdminPage() {
   const handleSave = async () => {
     if (!user) return
 
+    // Validation
+    if (!formData.title?.trim()) {
+      setError('Title is required')
+      return
+    }
+    if (!formData.excerpt?.trim()) {
+      setError('Excerpt is required')
+      return
+    }
+    if (!formData.content?.trim()) {
+      setError('Content is required')
+      return
+    }
+
     try {
       setIsSaving(true)
+      setError(null)
       
       const articleData: Partial<Article> = {
         ...formData,
@@ -128,29 +149,52 @@ export default function BlogAdminPage() {
         featuredImage: formData.featuredImage || '/images/blog/default.jpg'
       }
 
+      console.log('Saving article:', articleData) // Debug log
+
       if (editingArticle) {
-        await BlogService.updateArticle(editingArticle.id, articleData)
+        const success = await BlogService.updateArticle(editingArticle.id, articleData)
+        if (!success) {
+          throw new Error('Failed to update article')
+        }
       } else {
-        await BlogService.createArticle(articleData as Omit<Article, 'id'>)
+        const newId = await BlogService.createArticle(articleData as Omit<Article, 'id'>)
+        if (!newId) {
+          throw new Error('Failed to create article')
+        }
       }
 
       await loadArticles()
       resetForm()
     } catch (error) {
       console.error('Error saving article:', error)
+      setError('Failed to save article. Please try again.')
     } finally {
       setIsSaving(false)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this article?')) {
-      try {
-        await BlogService.deleteArticle(id)
-        await loadArticles()
-      } catch (error) {
-        console.error('Error deleting article:', error)
+  const handleDelete = async (id: string, title: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${title}"?\n\nThis action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      setDeletingId(id)
+      setError(null)
+      console.log('Deleting article with ID:', id) // Debug log
+      
+      const success = await BlogService.deleteArticle(id)
+      if (!success) {
+        throw new Error('Failed to delete article')
       }
+      
+      console.log('Article deleted successfully') // Debug log
+      await loadArticles()
+    } catch (error) {
+      console.error('Error deleting article:', error)
+      setError(`Failed to delete article: ${error}`)
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -240,6 +284,25 @@ export default function BlogAdminPage() {
       </header>
 
       <main className="relative z-10 container mx-auto px-6 py-8">
+        
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-500/20 border border-red-500/40 rounded-lg text-red-200 flex items-center"
+          >
+            <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+            <span className="font-tech text-sm">{error}</span>
+            <button 
+              onClick={() => setError(null)}
+              className="ml-auto text-red-300 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+
         <div className="grid lg:grid-cols-4 gap-8">
           
           {/* Articles List - 3 columns */}
@@ -321,6 +384,11 @@ export default function BlogAdminPage() {
                           </div>
                         )}
                       </div>
+
+                      {/* Debug info */}
+                      <div className="text-xs text-white/40 font-tech mt-2">
+                        ID: {article.id}
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-2 ml-4">
@@ -332,7 +400,13 @@ export default function BlogAdminPage() {
                       <Button variant="ghost" size="sm" onClick={() => startEdit(article)}>
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(article.id)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDelete(article.id, article.title)}
+                        loading={deletingId === article.id}
+                        disabled={deletingId === article.id}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -386,6 +460,7 @@ export default function BlogAdminPage() {
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric"
                         placeholder="Article title..."
+                        required
                       />
                     </div>
 
@@ -418,6 +493,7 @@ export default function BlogAdminPage() {
                         rows={3}
                         className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric resize-none"
                         placeholder="Brief description..."
+                        required
                       />
                     </div>
 
@@ -467,6 +543,7 @@ export default function BlogAdminPage() {
                         rows={12}
                         className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric resize-none"
                         placeholder="Article content in Markdown format..."
+                        required
                       />
                     </div>
 

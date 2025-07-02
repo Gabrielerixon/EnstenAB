@@ -1,4 +1,4 @@
-// app/admin/dashboard/page.tsx
+// app/admin/dashboard/page.tsx - UPDATED with real stats
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import { BlogService } from '@/lib/blog-service'
 import { 
   BookOpen, 
   Users, 
@@ -16,7 +17,9 @@ import {
   LogOut,
   Plus,
   Eye,
-  Edit
+  Edit,
+  Database,
+  RefreshCw
 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import Link from 'next/link'
@@ -28,6 +31,13 @@ interface DashboardStats {
   lastLogin: string
 }
 
+interface RecentArticle {
+  id: string
+  title: string
+  status: 'Published' | 'Draft'
+  publishedAt: string
+}
+
 export default function AdminDashboardPage() {
   const [user, loading] = useAuthState(auth)
   const [stats, setStats] = useState<DashboardStats>({
@@ -36,6 +46,8 @@ export default function AdminDashboardPage() {
     totalViews: 0,
     lastLogin: new Date().toISOString()
   })
+  const [recentArticles, setRecentArticles] = useState<RecentArticle[]>([])
+  const [isLoadingStats, setIsLoadingStats] = useState(true)
   const router = useRouter()
 
   // Redirect if not authenticated
@@ -44,6 +56,48 @@ export default function AdminDashboardPage() {
       router.push('/admin/login')
     }
   }, [user, loading, router])
+
+  // Load real stats from Firebase
+  useEffect(() => {
+    if (user) {
+      loadDashboardStats()
+    }
+  }, [user])
+
+  const loadDashboardStats = async () => {
+    try {
+      setIsLoadingStats(true)
+      console.log('📊 Loading dashboard stats...')
+      
+      // Get real article count from Firebase
+      const articles = await BlogService.getArticles()
+      console.log('📚 Found', articles.length, 'articles')
+      
+      // Get recent articles
+      const recent = articles.slice(0, 3).map(article => ({
+        id: article.id,
+        title: article.title,
+        status: 'Published' as const, // All articles in Firebase are published
+        publishedAt: article.publishedAt
+      }))
+      
+      setRecentArticles(recent)
+      
+      // Update stats with real data
+      setStats({
+        totalArticles: articles.length,
+        totalContacts: 12, // TODO: Replace with real contact form data when implemented
+        totalViews: 1250, // TODO: Replace with real analytics when implemented  
+        lastLogin: new Date().toISOString()
+      })
+      
+      console.log('✅ Dashboard stats loaded')
+    } catch (error) {
+      console.error('❌ Error loading dashboard stats:', error)
+    } finally {
+      setIsLoadingStats(false)
+    }
+  }
 
   const handleLogout = async () => {
     try {
@@ -54,16 +108,9 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // Mock stats - replace with real data from Firestore
-  useEffect(() => {
-    // TODO: Fetch real stats from Firestore
-    setStats({
-      totalArticles: 3,
-      totalContacts: 12,
-      totalViews: 1250,
-      lastLogin: new Date().toISOString()
-    })
-  }, [])
+  const handleRefreshStats = () => {
+    loadDashboardStats()
+  }
 
   if (loading) {
     return (
@@ -96,18 +143,25 @@ export default function AdminDashboardPage() {
       color: 'solar-gold'
     },
     {
+      title: 'Database Utilities',
+      description: 'Seed articles and manage database',
+      icon: Database,
+      href: '/admin/utilities',
+      color: 'solar-racing'
+    },
+    {
       title: 'View Contact Forms',
       description: 'Check customer inquiries',
       icon: Mail,
       href: '/admin/contacts',
-      color: 'solar-racing'
+      color: 'solar-electric'
     },
     {
       title: 'Site Settings',
       description: 'Configure website settings',
       icon: Settings,
       href: '/admin/settings',
-      color: 'solar-electric'
+      color: 'solar-gold'
     }
   ]
 
@@ -117,28 +171,32 @@ export default function AdminDashboardPage() {
       value: stats.totalArticles,
       icon: BookOpen,
       color: 'solar-electric',
-      change: '+2 this month'
+      change: stats.totalArticles > 0 ? 'From Firebase' : 'No articles yet',
+      isReal: true
     },
     {
-      title: 'Contact Inquiries',
+      title: 'Contact Inquiries', 
       value: stats.totalContacts,
       icon: Mail,
       color: 'solar-gold',
-      change: '+5 this week'
+      change: '+5 this week',
+      isReal: false // TODO: Make this real when contact form backend is implemented
     },
     {
       title: 'Total Page Views',
       value: stats.totalViews.toLocaleString(),
       icon: Eye,
-      color: 'solar-racing',
-      change: '+15% this month'
+      color: 'solar-racing', 
+      change: '+15% this month',
+      isReal: false // TODO: Make this real when analytics are implemented
     },
     {
       title: 'Active Users',
       value: '5',
       icon: Users,
       color: 'solar-electric',
-      change: 'All team members'
+      change: 'All team members',
+      isReal: false
     }
   ]
 
@@ -161,6 +219,16 @@ export default function AdminDashboardPage() {
             </div>
             
             <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleRefreshStats}
+                loading={isLoadingStats}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+              
               <Link href="/" target="_blank">
                 <Button variant="ghost" size="sm">
                   <Eye className="w-4 h-4 mr-2" />
@@ -207,22 +275,32 @@ export default function AdminDashboardPage() {
           {statsCards.map((stat, index) => (
             <div
               key={index}
-              className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6 hover:border-white/40 transition-all duration-300"
+              className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6 hover:border-white/40 transition-all duration-300 relative"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 bg-${stat.color} rounded-lg flex items-center justify-center`}>
                   <stat.icon className="w-6 h-6 text-white" />
                 </div>
-                <TrendingUp className="w-4 h-4 text-green-400" />
+                <div className="flex items-center">
+                  {stat.isReal ? (
+                    <div className="w-2 h-2 bg-green-400 rounded-full" title="Real data from Firebase" />
+                  ) : (
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full" title="Mock data" />
+                  )}
+                </div>
               </div>
               
               <div className="text-2xl font-racing font-bold text-white mb-1">
-                {stat.value}
+                {isLoadingStats && stat.isReal ? (
+                  <div className="w-16 h-8 bg-white/20 animate-pulse rounded" />
+                ) : (
+                  stat.value
+                )}
               </div>
               <div className="text-white/80 font-tech text-sm mb-2">
                 {stat.title}
               </div>
-              <div className="text-green-400 font-tech text-xs">
+              <div className={`font-tech text-xs ${stat.isReal ? 'text-green-400' : 'text-yellow-400'}`}>
                 {stat.change}
               </div>
             </div>
@@ -238,7 +316,7 @@ export default function AdminDashboardPage() {
         >
           <h3 className="text-xl font-racing font-bold text-white mb-6">Quick Actions</h3>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {quickActions.map((action, index) => (
               <Link key={index} href={action.href}>
                 <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6 hover:border-white/40 transition-all duration-300 card-hover cursor-pointer group">
@@ -265,51 +343,54 @@ export default function AdminDashboardPage() {
           transition={{ delay: 0.3 }}
           className="grid lg:grid-cols-2 gap-8"
         >
-          {/* Recent Articles */}
+          {/* Recent Articles - Now with real data */}
           <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-racing font-bold text-white">Recent Articles</h3>
+              <h3 className="text-lg font-racing font-bold text-white flex items-center">
+                Recent Articles
+                <div className="w-2 h-2 bg-green-400 rounded-full ml-2" title="Real data from Firebase" />
+              </h3>
               <Link href="/admin/blog">
                 <Button variant="ghost" size="sm">View All</Button>
               </Link>
             </div>
             
             <div className="space-y-4">
-              {[
-                {
-                  title: 'Getting Started with Current One Control Unit',
-                  status: 'Published',
-                  date: '2 days ago'
-                },
-                {
-                  title: 'BWSC 2025: What Teams Need to Know',
-                  status: 'Published', 
-                  date: '5 days ago'
-                },
-                {
-                  title: 'Integrating Current One: Advanced Guide',
-                  status: 'Draft',
-                  date: '1 week ago'
-                }
-              ].map((article, i) => (
-                <div key={i} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
-                  <div>
-                    <h4 className="text-white font-tech font-semibold text-sm">
-                      {article.title}
-                    </h4>
-                    <p className="text-white/60 text-xs font-tech">
-                      {article.date}
-                    </p>
+              {isLoadingStats ? (
+                // Loading skeleton
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="py-3 border-b border-white/10 last:border-0">
+                    <div className="w-3/4 h-4 bg-white/20 animate-pulse rounded mb-2" />
+                    <div className="w-1/2 h-3 bg-white/10 animate-pulse rounded" />
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-tech ${
-                    article.status === 'Published' 
-                      ? 'bg-green-500/20 text-green-300' 
-                      : 'bg-yellow-500/20 text-yellow-300'
-                  }`}>
-                    {article.status}
-                  </span>
+                ))
+              ) : recentArticles.length > 0 ? (
+                recentArticles.map((article, i) => (
+                  <div key={i} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
+                    <div>
+                      <h4 className="text-white font-tech font-semibold text-sm">
+                        {article.title.length > 50 ? `${article.title.substring(0, 50)}...` : article.title}
+                      </h4>
+                      <p className="text-white/60 text-xs font-tech">
+                        {new Date(article.publishedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className="px-2 py-1 rounded-full text-xs font-tech bg-green-500/20 text-green-300">
+                      {article.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <BookOpen className="w-8 h-8 text-white/40 mx-auto mb-2" />
+                  <p className="text-white/60 font-tech text-sm">No articles found</p>
+                  <Link href="/admin/utilities">
+                    <Button variant="ghost" size="sm" className="mt-2">
+                      Seed Sample Articles
+                    </Button>
+                  </Link>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -320,9 +401,9 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               {[
                 { service: 'Website', status: 'Operational', uptime: '99.9%' },
-                { service: 'Database', status: 'Operational', uptime: '99.8%' },
-                { service: 'Email Service', status: 'Operational', uptime: '100%' },
-                { service: 'CDN', status: 'Operational', uptime: '99.9%' }
+                { service: 'Firebase Database', status: 'Connected', uptime: '99.8%' },
+                { service: 'Authentication', status: 'Active', uptime: '100%' },
+                { service: 'Admin Panel', status: 'Ready', uptime: '99.9%' }
               ].map((service, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -335,6 +416,19 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-white/20">
+              <div className="text-xs text-white/60 font-tech">
+                <div className="flex items-center mb-1">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
+                  Real-time data from Firebase
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2" />
+                  Placeholder data (to be implemented)
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

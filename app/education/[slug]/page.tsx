@@ -1,11 +1,11 @@
-// app/education/[slug]/page.tsx
+// app/education/[slug]/page.tsx - FIXED with better error handling
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Clock, User, BookOpen, Tag } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, User, BookOpen, Tag, AlertCircle } from 'lucide-react'
 import { Article } from '@/lib/types'
 import { BlogService } from '@/lib/blog-service'
 import { formatDate } from '@/lib/utils'
@@ -16,27 +16,63 @@ export default function BlogPostPage() {
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const loadArticle = async () => {
       try {
         setLoading(true)
+        setError(null)
+        
+        console.log('Loading article with slug:', slug) // Debug log
+        
         const fetchedArticle = await BlogService.getArticle(slug)
-        setArticle(fetchedArticle)
+        console.log('Fetched article:', fetchedArticle) // Debug log
+        
+        if (!fetchedArticle) {
+          // Try to find article by searching all articles for matching title/id
+          console.log('Article not found by ID, searching all articles...') // Debug log
+          const allArticles = await BlogService.getArticles()
+          console.log('All articles:', allArticles) // Debug log
+          
+          // Try to find by partial match on ID or title
+          const foundArticle = allArticles.find(a => 
+            a.id === slug || 
+            a.id.includes(slug) || 
+            a.title.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(slug.toLowerCase())
+          )
+          
+          if (foundArticle) {
+            console.log('Found article by search:', foundArticle) // Debug log
+            setArticle(foundArticle)
+          } else {
+            throw new Error(`Article not found. Available articles: ${allArticles.map(a => a.id).join(', ')}`)
+          }
+        } else {
+          setArticle(fetchedArticle)
+        }
 
         if (fetchedArticle) {
           // Load related articles from same category
-          const related = await BlogService.getArticlesByCategory(fetchedArticle.category)
-          setRelatedArticles(related.filter(a => a.id !== fetchedArticle.id).slice(0, 3))
+          try {
+            const related = await BlogService.getArticlesByCategory(fetchedArticle.category)
+            setRelatedArticles(related.filter(a => a.id !== fetchedArticle.id).slice(0, 3))
+          } catch (relatedError) {
+            console.error('Error loading related articles:', relatedError)
+            // Don't fail the whole page for related articles
+          }
         }
       } catch (error) {
         console.error('Error loading article:', error)
+        setError(error instanceof Error ? error.message : 'Unknown error occurred')
       } finally {
         setLoading(false)
       }
     }
 
-    loadArticle()
+    if (slug) {
+      loadArticle()
+    }
   }, [slug])
 
   if (loading) {
@@ -50,13 +86,44 @@ export default function BlogPostPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon flex items-center justify-center">
+        <div className="text-center text-white max-w-2xl mx-auto px-6">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-racing font-bold mb-2">Error Loading Article</h1>
+          <p className="text-white/70 font-tech mb-6">{error}</p>
+          <div className="space-y-3">
+            <Link href="/education">
+              <button className="btn-primary px-6 py-3 rounded-lg font-tech font-semibold mr-4">
+                Back to Education
+              </button>
+            </Link>
+            <Link href="/admin/blog">
+              <button className="btn-secondary px-6 py-3 rounded-lg font-tech font-semibold">
+                Go to Admin
+              </button>
+            </Link>
+          </div>
+          <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/20 text-left">
+            <p className="text-white/60 font-tech text-sm">
+              <strong>Debug info:</strong><br />
+              Requested slug: <code>{slug}</code><br />
+              This usually happens when the article ID doesn't match the URL format.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (!article) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon flex items-center justify-center">
         <div className="text-center text-white">
           <BookOpen className="w-16 h-16 text-white/60 mx-auto mb-4" />
           <h1 className="text-2xl font-racing font-bold mb-2">Article Not Found</h1>
-          <p className="text-white/70 font-tech mb-6">The article you&apos;re looking for doesn&apos;t exist.</p>
+          <p className="text-white/70 font-tech mb-6">The article you're looking for doesn't exist.</p>
           <Link href="/education">
             <button className="btn-primary px-6 py-3 rounded-lg font-tech font-semibold">
               Back to Education
