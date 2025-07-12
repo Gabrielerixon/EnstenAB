@@ -37,8 +37,7 @@ export const productsData: Product[] = [
       { label: 'Input Voltage Range', value: '40-160V' },
       { label: 'Dimensions', value: '275 x 183 x 56mm' },
       { label: 'Communication', value: 'CAN Bus, UART' },
-      { label: 'Data Logging', value: 'Real-time' },
-      { label: 'Certification', value: 'BWSC 2025 Approved' }
+      { label: 'Data Logging', value: 'Real-time' }
     ],
     images: [
       {
@@ -172,8 +171,6 @@ export const productsData: Product[] = [
       { label: 'Dimensions', value: '129 x 67 x 28mm' },
       { label: 'Protocol Support', value: 'Mitsuba Analogue to CAN' },
       { label: 'Compatibility', value: 'Mitsuba Motor Controllers' },
-      { label: 'Operating Temperature', value: '-40°C to +85°C' },
-      { label: 'Weight', value: '120g' }
     ],
     images: [
       {
