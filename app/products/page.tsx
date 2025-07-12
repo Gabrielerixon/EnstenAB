@@ -1,13 +1,13 @@
-// app/products/page.tsx
+// app/products/page.tsx - UPDATED to use Firebase data
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Zap, ArrowRight, Grid, List, Search } from 'lucide-react'
-import { ProductCategory } from '@/lib/types'
-import { productsData } from '@/lib/products-data'
+import { ProductCategory, Product } from '@/lib/types'
+import { ProductsService } from '@/lib/products-service'
 
 const categoryLabels: Record<ProductCategory, string> = {
   'control-unit': 'Control Units',
@@ -18,22 +18,47 @@ const categoryLabels: Record<ProductCategory, string> = {
 const availabilityLabels = {
   'available': 'Available Now',
   'pre-order': 'Pre-Order',
-  'coming-soon': 'Coming Soon'
+  'coming-soon': 'Coming Soon',
+  'discontinued': 'Discontinued'
 }
 
 const availabilityColors = {
   'available': 'text-green-400',
   'pre-order': 'text-solar-gold',
-  'coming-soon': 'text-solar-electric'
+  'coming-soon': 'text-solar-electric',
+  'discontinued': 'text-red-400'
 }
 
 export default function ProductsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Load products from Firebase
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const fetchedProducts = await ProductsService.getProducts()
+        console.log('📦 Loaded products:', fetchedProducts)
+        setProducts(fetchedProducts)
+      } catch (error) {
+        console.error('Error loading products:', error)
+        setError('Failed to load products. Please try again.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProducts()
+  }, [])
 
   // Filter products
-  const filteredProducts = productsData.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory
     const matchesSearch = searchQuery === '' || 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -44,6 +69,72 @@ export default function ProductsPage() {
   })
 
   const categories: ProductCategory[] = ['control-unit', 'solar-panel', 'accessory']
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon">
+        <div className="absolute inset-0 tech-grid opacity-20" />
+        
+        {/* Header */}
+        <section className="relative pt-32 pb-16">
+          <div className="container mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-16"
+            >
+              <div className="flex items-center justify-center mb-6">
+                <Zap className="w-8 h-8 text-solar-electric mr-3" />
+                <span className="text-solar-electric font-tech font-semibold tracking-wider uppercase">
+                  Product Catalog
+                </span>
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-racing font-bold text-white mb-6">
+                RACING
+                <span className="block text-gradient">TECHNOLOGY</span>
+              </h1>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Loading State */}
+        <section className="relative pb-24">
+          <div className="container mx-auto px-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center py-16">
+                <div className="w-16 h-16 border-4 border-solar-electric/20 border-t-solar-electric rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-white font-tech">Loading products...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon">
+        <div className="absolute inset-0 tech-grid opacity-20" />
+        <section className="relative pt-32 pb-24">
+          <div className="container mx-auto px-6">
+            <div className="max-w-6xl mx-auto text-center py-16">
+              <h1 className="text-2xl font-racing font-bold text-white mb-4">Error Loading Products</h1>
+              <p className="text-white/70 font-tech mb-6">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="btn-primary px-6 py-3 rounded-lg font-tech font-semibold"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon">
@@ -233,7 +324,7 @@ export default function ProductsPage() {
                           {categoryLabels[product.category]}
                         </div>
                         
-                        {/* Availability Badge */}
+                        {/* Availability Badge - THIS IS WHAT ADMIN CAN CHANGE */}
                         <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-tech font-semibold ${availabilityColors[product.availability]} bg-black/50 backdrop-blur-sm`}>
                           {availabilityLabels[product.availability]}
                         </div>

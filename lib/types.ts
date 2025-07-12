@@ -1,4 +1,4 @@
-// lib/types.ts - Updated with 3D model support
+// lib/types.ts - Updated with discontinued availability option
 // Core type definitions for the Ensten AB website
 
 // Navigation
@@ -15,7 +15,7 @@ export interface Model3D {
   description: string
 }
 
-// Products
+// Products - UPDATED with discontinued option
 export interface Product {
   id: string
   name: string
@@ -30,7 +30,7 @@ export interface Product {
   highlights: string[]
   category: ProductCategory
   price?: string
-  availability: 'available' | 'pre-order' | 'coming-soon'
+  availability: 'available' | 'pre-order' | 'coming-soon' | 'discontinued'
   models3D?: Model3D[] // Optional 3D models array
 }
 

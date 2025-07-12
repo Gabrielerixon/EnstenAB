@@ -1,4 +1,4 @@
-// app/admin/dashboard/page.tsx - UPDATED with real stats
+// app/admin/dashboard/page.tsx - UPDATED with real stats and no fake analytics
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -8,6 +8,7 @@ import { motion } from 'framer-motion'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { BlogService } from '@/lib/blog-service'
+import { ProductsService } from '@/lib/products-service'
 import { 
   BookOpen, 
   Users, 
@@ -18,15 +19,16 @@ import {
   Eye,
   Edit,
   Database,
-  RefreshCw
+  RefreshCw,
+  Package
 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import Link from 'next/link'
 
 interface DashboardStats {
   totalArticles: number
+  totalProducts: number
   totalContacts: number
-  totalViews: number
   lastLogin: string
 }
 
@@ -41,8 +43,8 @@ export default function AdminDashboardPage() {
   const [user, loading] = useAuthState(auth)
   const [stats, setStats] = useState<DashboardStats>({
     totalArticles: 0,
+    totalProducts: 0,
     totalContacts: 0,
-    totalViews: 0,
     lastLogin: new Date().toISOString()
   })
   const [recentArticles, setRecentArticles] = useState<RecentArticle[]>([])
@@ -68,15 +70,20 @@ export default function AdminDashboardPage() {
       setIsLoadingStats(true)
       console.log('📊 Loading dashboard stats...')
       
-      // Get real article count from Firebase
-      const articles = await BlogService.getArticles()
+      // Get real data from Firebase
+      const [articles, products] = await Promise.all([
+        BlogService.getArticles(),
+        ProductsService.getProducts()
+      ])
+      
       console.log('📚 Found', articles.length, 'articles')
+      console.log('📦 Found', products.length, 'products')
       
       // Get recent articles
       const recent = articles.slice(0, 3).map(article => ({
         id: article.id,
         title: article.title,
-        status: 'Published' as const, // All articles in Firebase are published
+        status: 'Published' as const,
         publishedAt: article.publishedAt
       }))
       
@@ -85,8 +92,8 @@ export default function AdminDashboardPage() {
       // Update stats with real data
       setStats({
         totalArticles: articles.length,
+        totalProducts: products.length,
         totalContacts: 12, // TODO: Replace with real contact form data when implemented
-        totalViews: 1250, // TODO: Replace with real analytics when implemented  
         lastLogin: new Date().toISOString()
       })
       
@@ -142,10 +149,10 @@ export default function AdminDashboardPage() {
       color: 'solar-gold'
     },
     {
-      title: 'Database Utilities',
-      description: 'Seed articles and manage database',
-      icon: Database,
-      href: '/admin/utilities',
+      title: 'Manage Products',
+      description: 'Update product availability and info',
+      icon: Package,
+      href: '/admin/products',
       color: 'solar-racing'
     },
     {
@@ -156,11 +163,18 @@ export default function AdminDashboardPage() {
       color: 'solar-electric'
     },
     {
+      title: 'Database Utilities',
+      description: 'Seed articles and manage database',
+      icon: Database,
+      href: '/admin/utilities',
+      color: 'solar-gold'
+    },
+    {
       title: 'Site Settings',
       description: 'Configure website settings',
       icon: Settings,
       href: '/admin/settings',
-      color: 'solar-gold'
+      color: 'solar-electric'
     }
   ]
 
@@ -174,28 +188,28 @@ export default function AdminDashboardPage() {
       isReal: true
     },
     {
+      title: 'Products Listed',
+      value: stats.totalProducts,
+      icon: Package,
+      color: 'solar-gold',
+      change: stats.totalProducts > 0 ? 'Current One, Solar Modules, Cansuba' : 'No products yet',
+      isReal: true
+    },
+    {
       title: 'Contact Inquiries', 
       value: stats.totalContacts,
       icon: Mail,
-      color: 'solar-gold',
+      color: 'solar-racing',
       change: '+5 this week',
       isReal: false // TODO: Make this real when contact form backend is implemented
     },
     {
-      title: 'Total Page Views',
-      value: stats.totalViews.toLocaleString(),
-      icon: Eye,
-      color: 'solar-racing', 
-      change: '+15% this month',
-      isReal: false // TODO: Make this real when analytics are implemented
-    },
-    {
-      title: 'Active Users',
+      title: 'Active Team Members',
       value: '5',
       icon: Users,
       color: 'solar-electric',
-      change: 'All team members',
-      isReal: false
+      change: 'Engineering & Admin',
+      isReal: true
     }
   ]
 
@@ -255,11 +269,11 @@ export default function AdminDashboardPage() {
         >
           <div className="bg-gradient-to-r from-solar-electric/20 via-solar-gold/20 to-solar-racing/20 backdrop-blur-sm rounded-2xl border border-white/20 p-8">
             <h2 className="text-3xl font-racing font-bold text-white mb-4">
-              Content Management System
+              Content & Product Management
             </h2>
             <p className="text-white/90 font-tech text-lg max-w-3xl">
-              Manage educational content, blog posts, and customer communications for Ensten AB. 
-              Create engaging technical guides and share solar racing expertise with teams worldwide.
+              Manage educational content, product information, and customer communications for Ensten AB. 
+              Create engaging technical guides and maintain up-to-date product availability for teams worldwide.
             </p>
           </div>
         </motion.div>
@@ -315,7 +329,7 @@ export default function AdminDashboardPage() {
         >
           <h3 className="text-xl font-racing font-bold text-white mb-6">Quick Actions</h3>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quickActions.map((action, index) => (
               <Link key={index} href={action.href}>
                 <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6 hover:border-white/40 transition-all duration-300 card-hover cursor-pointer group">
