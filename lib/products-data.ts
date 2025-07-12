@@ -6,21 +6,21 @@ export const productsData: Product[] = [
     id: 'current-one',
     name: 'Current One',
     tagline: 'The Ultimate Solar Racing Control Unit',
-    description: 'Professional-grade control unit designed specifically for solar racing vehicles competing in the Bridgestone World Solar Challenge. Features advanced real-time processing, military-grade protection, and seamless CAN bus integration.',
+    description: 'Professional-grade control unit designed specifically for solar racing vehicles competing in the Bridgestone World Solar Challenge. Features advanced real-time processing and seamless CAN bus integration.',
     shortDescription: 'Professional-grade control unit for championship solar racing performance.',
     modelPath: '/models/current-one/Current One.glb',
     thumbnailPath: '/images/products/current-one/currentOne.png',
     features: [
       {
         id: 'processing',
-        title: '1000Hz Processing',
-        description: 'Lightning-fast data processing for real-time race decisions',
+        title: 'Real-time Data Logging',
+        description: 'Continuous data capture for race analysis and optimization',
         icon: 'cpu'
       },
       {
-        id: 'protection',
-        title: 'IP67 Protection',
-        description: 'Military-grade protection against dust and water',
+        id: 'lightweight',
+        title: 'Lightweight Design',
+        description: 'Under 1.5kg including steering wheel for minimal weight impact',
         icon: 'shield'
       },
       {
@@ -31,13 +31,13 @@ export const productsData: Product[] = [
       }
     ],
     specifications: [
-      { label: 'Operating Voltage', value: '12-48V DC' },
-      { label: 'Processing Speed', value: '1000Hz' },
-      { label: 'Communication', value: 'CAN Bus, UART, SPI' },
-      { label: 'Protection Rating', value: 'IP67' },
-      { label: 'Operating Temperature', value: '-20°C to +85°C' },
-      { label: 'Dimensions', value: '120 x 80 x 40mm' },
-      { label: 'Weight', value: '450g' },
+      { label: 'Power Consumption', value: '<4W' },
+      { label: 'Weight (with steering wheel)', value: '<1.5kg' },
+      { label: 'System Voltage', value: '12V' },
+      { label: 'Input Voltage Range', value: '40-160V' },
+      { label: 'Dimensions', value: '275 x 183 x 56mm' },
+      { label: 'Communication', value: 'CAN Bus, UART' },
+      { label: 'Data Logging', value: 'Real-time' },
       { label: 'Certification', value: 'BWSC 2025 Approved' }
     ],
     images: [
@@ -71,39 +71,39 @@ export const productsData: Product[] = [
   },
   {
     id: 'solar-module',
-    name: 'Solar Module',
+    name: 'Custom Solar Modules',
     tagline: 'High-Efficiency Solar Panel System',
-    description: 'Advanced solar panel system designed for maximum energy harvesting in racing conditions. Features industry-leading efficiency and lightweight construction optimized for competitive solar vehicles.',
-    shortDescription: 'High-efficiency solar panel system for optimal energy harvesting.',
+    description: 'Custom-designed solar modules featuring Maxeon Gen7 cells for maximum energy harvesting in racing conditions. Optimized thickness and weight for competitive solar vehicles.',
+    shortDescription: 'Custom solar modules with Maxeon Gen7 cells for optimal energy harvesting.',
     modelPath: '/models/current-one/solpanel.glb',
     thumbnailPath: '/images/products/solar-panel/Solpanel/solarmodule.jpg',
     features: [
       {
         id: 'efficiency',
         title: 'High Efficiency',
-        description: 'Industry-leading solar cell efficiency for maximum power output',
+        description: 'Maxeon Gen7 cells delivering approximately 26% efficiency',
         icon: 'zap'
       },
       {
         id: 'lightweight',
-        title: 'Lightweight Design',
-        description: 'Optimized for minimal weight impact on vehicle performance',
+        title: 'Ultra-Thin Design',
+        description: 'Only 0.8mm thickness for minimal weight and aerodynamic impact',
         icon: 'cpu'
       },
       {
-        id: 'durability',
-        title: 'Racing Durability',
-        description: 'Built to withstand harsh racing conditions',
+        id: 'custom',
+        title: 'Custom Configuration',
+        description: 'Tailored dimensions up to 4x7 Maxeon cells per module',
         icon: 'shield'
       }
     ],
     specifications: [
-      { label: 'Cell Efficiency', value: '22.5%' },
-      { label: 'Maximum Power', value: '1200W' },
-      { label: 'Operating Voltage', value: '40-60V DC' },
-      { label: 'Weight per Panel', value: '2.8kg' },
-      { label: 'Temperature Coefficient', value: '-0.35%/°C' },
-      { label: 'Dimensions', value: '1650 x 670 x 35mm' }
+      { label: 'Cell Type', value: 'Maxeon Gen7 (or other cells on request)' },
+      { label: 'Efficiency', value: '~26%' },
+      { label: 'Maximum Dimensions', value: '4x7 Maxeon cells (550 x 900mm)' },
+      { label: 'Thickness', value: '0.8mm' },
+      { label: 'Weight', value: '~1kg/m²' },
+      { label: 'Configuration', value: 'Custom design available' }
     ],
     images: [
       {
@@ -123,9 +123,9 @@ export const productsData: Product[] = [
       }
     ],
     highlights: [
-      'Industry-Leading Efficiency',
-      'Racing-Optimized Design',
-      'Lightweight Construction',
+      'Maxeon Gen7 Technology',
+      'Custom Design Available',
+      'Ultra-Lightweight Construction',
       'Professional Installation Support'
     ],
     category: 'solar-panel',
@@ -142,16 +142,16 @@ export const productsData: Product[] = [
   {
     id: 'cansuba',
     name: 'Cansuba Converter',
-    tagline: 'Advanced CAN Bus Communication System',
-    description: 'Sophisticated CAN bus converter system designed for seamless communication between vehicle subsystems. Enables reliable data exchange and system integration for solar racing vehicles.',
-    shortDescription: 'Advanced CAN bus converter for seamless system communication.',
+    tagline: 'Mitsuba Analogue Converter',
+    description: 'Specialized converter designed to enable analogue Mitsuba motor controllers to communicate over CAN bus. Essential interface for modern solar racing vehicle integration.',
+    shortDescription: 'Mitsuba analogue converter for seamless CAN bus communication.',
     modelPath: '/models/current-one/Cansuba.glb',
     thumbnailPath: '/images/products/cansuba/cansuba.png',
     features: [
       {
         id: 'communication',
-        title: 'Multi-Protocol Support',
-        description: 'Supports multiple communication protocols for maximum compatibility',
+        title: 'Mitsuba Analogue Converter',
+        description: 'Enables analogue Mitsuba motor controllers to communicate over CAN',
         icon: 'zap'
       },
       {
@@ -163,16 +163,16 @@ export const productsData: Product[] = [
       {
         id: 'integration',
         title: 'Easy Integration',
-        description: 'Plug-and-play setup with existing vehicle systems',
+        description: 'Plug-and-play setup with existing Mitsuba systems',
         icon: 'cpu'
       }
     ],
     specifications: [
-      { label: 'Protocol Support', value: 'CAN 2.0A/B, CAN-FD' },
-      { label: 'Baud Rate', value: '125kbps - 1Mbps' },
-      { label: 'Operating Voltage', value: '12-24V DC' },
+      { label: 'Voltage', value: '12V' },
+      { label: 'Dimensions', value: '129 x 67 x 28mm' },
+      { label: 'Protocol Support', value: 'Mitsuba Analogue to CAN' },
+      { label: 'Compatibility', value: 'Mitsuba Motor Controllers' },
       { label: 'Operating Temperature', value: '-40°C to +85°C' },
-      { label: 'Dimensions', value: '85 x 55 x 25mm' },
       { label: 'Weight', value: '120g' }
     ],
     images: [
@@ -183,8 +183,8 @@ export const productsData: Product[] = [
       }
     ],
     highlights: [
-      'Multi-Protocol Support',
-      'Robust Communication',
+      'Mitsuba Motor Controller Compatible',
+      'Robust CAN Communication',
       'Easy Integration',
       'Compact Design'
     ],

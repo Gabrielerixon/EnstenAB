@@ -40,26 +40,17 @@ export function Header() {
     }`}>
       <nav className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+          {/* Logo - UPPDATERAD med ny styling */}
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="relative">
-              <div className="w-10 h-10 bg-solar-gradient rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Zap className="w-6 h-6 text-white" />
-              </div>
-              {/* Energy pulse effect */}
-              <div className="absolute inset-0 bg-solar-electric/20 rounded-lg animate-pulse-glow opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
             <div className="hidden sm:block">
-              <div className="text-2xl font-racing font-bold text-white group-hover:text-solar-electric transition-colors">
-                ENSTEN AB
-              </div>
-              <div className="text-xs text-white/60 font-tech tracking-wider -mt-1">
-                RACING TECHNOLOGY
+              {/* ÄNDRAD: Nu med "ensten" i lowercase och biome w04 italic stil */}
+              <div className="text-4xl font-bold text-white group-hover:text-solar-electric transition-colors" style={{ fontFamily: 'italic', fontStyle: 'italic' }}>
+                ensten
               </div>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - CONTACT US-KNAPPEN BORTTAGEN */}
           <div className="hidden lg:flex items-center space-x-8">
             {NAVIGATION_ITEMS.map((item) => (
               <Link
@@ -78,12 +69,7 @@ export function Header() {
               </Link>
             ))}
             
-            {/* CTA Button - Fixed with proper navigation */}
-            <Link href="/contact">
-              <button className="btn-primary px-6 py-3 rounded-lg font-tech font-semibold tracking-wide ml-4">
-                Contact Us
-              </button>
-            </Link>
+            {/* CONTACT US-KNAPPEN BORTTAGEN */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -117,7 +103,7 @@ export function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - CONTACT US BORTTAGEN ÄVEN HÄR */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -149,21 +135,7 @@ export function Header() {
                     </motion.div>
                   ))}
                   
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: NAVIGATION_ITEMS.length * 0.1 }}
-                    className="pt-4 border-t border-white/10"
-                  >
-                    <Link href="/contact">
-                      <button 
-                        className="btn-primary w-full py-3 rounded-lg font-tech font-semibold"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Contact Us
-                      </button>
-                    </Link>
-                  </motion.div>
+                  {/* CONTACT US-KNAPPEN BORTTAGEN FRÅN MOBILE OCKSÅ */}
                 </div>
               </div>
             </motion.div>

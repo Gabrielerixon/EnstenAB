@@ -1,4 +1,4 @@
-// app/products/[id]/page.tsx - IMPROVED 3D MODEL DISPLAY
+// app/products/[id]/page.tsx - BILDER FÖRE 3D-MODELLER
 'use client'
 
 import { useState, Suspense } from 'react'
@@ -215,22 +215,24 @@ export default function ProductPage() {
     )
   }
 
-  // Create gallery items from both 3D models and images
+  // ÄNDRAT: Bilder först, sedan 3D-modeller
   const galleryItems: GalleryItemType[] = [
-    ...(product.models3D?.map(model => ({
-      type: '3d-model' as const,
-      src: model.path,
-      name: model.name,
-      description: model.description,
-      alt: `3D Model of ${model.name}`
-    })) || []),
+    // BILDER FÖRST
     ...product.images.map(image => ({
       type: 'image' as const,
       src: image.src,
       alt: image.alt,
       caption: image.caption,
       name: image.caption || product.name
-    }))
+    })),
+    // 3D-MODELLER EFTER
+    ...(product.models3D?.map(model => ({
+      type: '3d-model' as const,
+      src: model.path,
+      name: model.name,
+      description: model.description,
+      alt: `3D Model of ${model.name}`
+    })) || [])
   ]
 
   const activeGalleryItem = galleryItems[activeGalleryIndex]

@@ -40,7 +40,7 @@ export const Hero = () => {
             <div className="h-1 w-32 bg-solar-gradient mx-auto mb-8 rounded-full" />
           </motion.div>
 
-          {/* Tagline */}
+          {/* Tagline - UPPDATERAD: Car -> Vehicles */}
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -48,7 +48,7 @@ export const Hero = () => {
             className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-white/80 mb-12 max-w-4xl mx-auto font-tech"
           >
             Control Your
-            <span className="text-solar-electric font-semibold"> Solar-Powered Car </span>
+            <span className="text-solar-electric font-semibold"> Solar-Powered Vehicles </span>
             <br className="hidden md:block" />
             <span className="text-solar-gold">for Championship Performance</span>
           </motion.p>
@@ -114,28 +114,7 @@ export const Hero = () => {
             </Link>
           </motion.div>
 
-          {/* Stats Row - Enhanced with 3D model info */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-2xl mx-auto mb-24"
-          >
-            {[
-              { value: "1000Hz", label: "Processing Rate" },
-              { value: "IP67", label: "Protection Rating" },
-              { value: "3000km", label: "BWSC Distance" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="text-xl md:text-2xl lg:text-3xl font-racing font-bold text-solar-electric mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-white/60 font-tech">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </motion.div>
+          {/* STATISTIKER BORTTAGNA - Tidigare 1000Hz, IP67, 3000km */}
 
           {/* NEW: Performance Achievement Section */}
           <motion.div

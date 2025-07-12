@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Quote, ChevronDown, ChevronUp, Award, Trophy } from 'lucide-react'
+import { Quote, ChevronDown, ChevronUp, Award, Trophy, Languages } from 'lucide-react'
 import Image from 'next/image'
 
 const testimonials = [
@@ -21,22 +21,36 @@ const testimonials = [
   {
     id: 'hust',
     quote: "ENSTEN har bidragit med god expertis och ett proffsigt bemötande. Alltid varit snabba med hjälp när det uppstått frågor.",
+    quoteEn: "ENSTEN has contributed with excellent expertise and professional service. They have always been quick to help when questions have arisen.",
     fullQuote: "ENSTEN har bidragit med god expertis och ett proffsigt bemötande. Alltid varit snabba med hjälp när det uppstått frågor.",
+    fullQuoteEn: "ENSTEN has contributed with excellent expertise and professional service. They have always been quick to help when questions have arisen.",
     author: "Oscar Pålsson",
     title: "Head of Electrical",
     company: "HUST",
     university: "Halmstad University Solar Team",
     achievement: "BWSC 2025 Competitor",
     logo: "/images/logos/hust-logo.svg",
-    date: "2025-05-12"
+    date: "2025-05-12",
+    hasTranslation: true
   }
 ]
 
 export default function TestimonialsSection() {
   const [expandedTestimonial, setExpandedTestimonial] = useState<string | null>(null)
+  const [translatedTestimonials, setTranslatedTestimonials] = useState<Set<string>>(new Set())
 
   const toggleExpanded = (id: string) => {
     setExpandedTestimonial(expandedTestimonial === id ? null : id)
+  }
+
+  const toggleTranslation = (id: string) => {
+    const newTranslated = new Set(translatedTestimonials)
+    if (newTranslated.has(id)) {
+      newTranslated.delete(id)
+    } else {
+      newTranslated.add(id)
+    }
+    setTranslatedTestimonials(newTranslated)
   }
 
   return (
@@ -50,7 +64,7 @@ export default function TestimonialsSection() {
       <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-solar-gold/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
 
       <div className="relative z-10 container mx-auto px-6">
-        {/* Section Header */}
+        {/* Section Header - UPPDATERAD TITEL */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -66,10 +80,10 @@ export default function TestimonialsSection() {
           </div>
           
           <h2 className="text-4xl md:text-6xl font-racing font-bold text-white mb-6">
-            PROVEN IN <span className="text-gradient">COMPETITION</span>
+            TRUSTED BY <span className="text-gradient">SOLAR TEAMS</span>
           </h2>
           <p className="text-xl text-white/80 max-w-3xl mx-auto font-tech">
-            Trusted by elite university teams competing at the highest levels of solar racing
+            Relied upon by elite university teams competing at the highest levels of solar racing
           </p>
           <div className="mt-8 h-px w-64 bg-solar-gradient mx-auto" />
         </motion.div>
@@ -93,6 +107,20 @@ export default function TestimonialsSection() {
                   {testimonial.achievement}
                 </div>
 
+                {/* Translation Button for Swedish testimonial */}
+                {testimonial.hasTranslation && (
+                  <div className="absolute top-4 left-4">
+                    <button
+                      onClick={() => toggleTranslation(testimonial.id)}
+                      className="bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-tech font-semibold flex items-center transition-colors"
+                      title={translatedTestimonials.has(testimonial.id) ? "Show Swedish" : "Translate to English"}
+                    >
+                      <Languages className="w-3 h-3 mr-1" />
+                      {translatedTestimonials.has(testimonial.id) ? 'SV' : 'EN'}
+                    </button>
+                  </div>
+                )}
+
                 {/* Quote Icon */}
                 <div className="mb-6">
                   <Quote className="w-8 h-8 text-solar-electric" />
@@ -101,7 +129,9 @@ export default function TestimonialsSection() {
                 {/* Quote Text */}
                 <div className="mb-6">
                   <blockquote className="text-white/90 font-tech text-lg leading-relaxed mb-4">
-                    &ldquo;{testimonial.quote}&rdquo;
+                    &ldquo;{translatedTestimonials.has(testimonial.id) && testimonial.quoteEn 
+                      ? testimonial.quoteEn 
+                      : testimonial.quote}&rdquo;
                   </blockquote>
                   
                   {/* Read More/Less Button */}
@@ -137,7 +167,9 @@ export default function TestimonialsSection() {
                     >
                       <div className="border-t border-white/20 pt-4 mb-6">
                         <blockquote className="text-white/80 font-tech leading-relaxed">
-                          &ldquo;{testimonial.fullQuote}&rdquo;
+                          &ldquo;{translatedTestimonials.has(testimonial.id) && testimonial.fullQuoteEn 
+                            ? testimonial.fullQuoteEn 
+                            : testimonial.fullQuote}&rdquo;
                         </blockquote>
                       </div>
                     </motion.div>
@@ -212,7 +244,7 @@ export default function TestimonialsSection() {
           ))}
         </div>
 
-        {/* Trust Indicators */}
+        {/* Trust Indicators - UPPDATERAD: "Swedish University Champions" BORTTAGEN */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -227,7 +259,7 @@ export default function TestimonialsSection() {
             </div>
             <div className="flex items-center">
               <div className="w-3 h-3 bg-solar-gold rounded-full mr-3" />
-              <span>Swedish University Champions</span>
+              <span>Trusted by Racing Teams</span>
             </div>
             <div className="flex items-center">
               <div className="w-3 h-3 bg-solar-racing rounded-full mr-3" />

@@ -1,4 +1,4 @@
-// app/contact/page.tsx - UPDATED WITH OSKAR OGARP
+// app/contact/page.tsx - UPPDATERAD MED SPONSORSHIP-KATEGORI
 'use client'
 
 import { useState } from 'react'
@@ -10,7 +10,9 @@ import {
   Send, 
   Linkedin,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Star,
+  Heart
 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import Link from 'next/link'
@@ -65,11 +67,12 @@ const teamMembers = [
   }
 ]
 
-// Contact form types
+// Contact form types - UPPDATERAD MED SPONSORSHIP
 const inquiryTypes = [
   { value: 'product', label: 'Product Inquiry' },
   { value: 'support', label: 'Technical Support' },
   { value: 'partnership', label: 'Partnership' },
+  { value: 'sponsorship', label: 'Sponsorship Request' },
   { value: 'general', label: 'General Question' }
 ]
 
@@ -129,6 +132,22 @@ export default function ContactPage() {
     }
   }
 
+  // Helper function to pre-fill sponsorship form
+  const handleSponsorshipClick = () => {
+    setFormData(prev => ({
+      ...prev,
+      inquiryType: 'sponsorship',
+      subject: 'Sponsorship Request',
+      message: 'Hi,\n\nWe are interested in exploring sponsorship opportunities with Ensten AB for our solar racing team.\n\nTeam Details:\n- University/Organization: \n- Team Size: \n- Competition Goals: \n- Previous Experience: \n\nWe would appreciate the opportunity to discuss how Ensten technology could support our racing objectives.\n\nBest regards,'
+    }))
+    
+    // Scroll to form
+    const form = document.getElementById('contact-form')
+    if (form) {
+      form.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon">
       {/* Background Effects */}
@@ -162,6 +181,37 @@ export default function ContactPage() {
             
             <div className="mt-8 h-px w-64 bg-solar-gradient mx-auto" />
           </motion.div>
+
+          {/* Sponsorship CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-center mb-16"
+          >
+            <div className="bg-gradient-to-r from-solar-racing/20 via-solar-gold/20 to-solar-electric/20 backdrop-blur-sm rounded-2xl border border-white/20 p-8 max-w-4xl mx-auto">
+              <div className="flex items-center justify-center mb-4">
+                <Heart className="w-6 h-6 text-solar-racing mr-3" />
+                <span className="text-solar-racing font-tech font-semibold tracking-wider uppercase">
+                  Team Sponsorship
+                </span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-racing font-bold text-white mb-4">
+                Looking for Racing Team Support?
+              </h2>
+              <p className="text-white/90 font-tech mb-6">
+                We believe in supporting the next generation of solar racing teams. 
+                Get in touch to explore sponsorship opportunities and technical partnerships.
+              </p>
+              <button 
+                onClick={handleSponsorshipClick}
+                className="bg-solar-racing text-white px-8 py-4 rounded-lg font-racing font-semibold hover:scale-105 transition-transform flex items-center mx-auto"
+              >
+                <Star className="w-5 h-5 mr-2" />
+                Request Sponsorship
+              </button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -172,6 +222,7 @@ export default function ContactPage() {
             
             {/* Contact Form */}
             <motion.div
+              id="contact-form"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
