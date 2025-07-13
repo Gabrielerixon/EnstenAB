@@ -117,22 +117,7 @@ export const Hero = () => {
           {/* STATISTIKER BORTTAGNA - Tidigare 1000Hz, IP67, 3000km */}
 
           {/* NEW: Performance Achievement Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.0 }}
-            className="mb-16"
-          >
-            <div className="text-center">
-              <div className="inline-flex items-center bg-gradient-to-r from-green-600/20 to-solar-electric/20 backdrop-blur-sm rounded-full px-6 py-3 border border-green-400/30">
-                <div className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse" />
-                <span className="text-white font-tech text-sm">
-                  Optimized for <span className="text-green-400 font-bold">95+ Performance Score</span> • 
-                  Interactive 3D on demand
-                </span>
-              </div>
-            </div>
-          </motion.div>
+          
         </div>
       </div>
 
