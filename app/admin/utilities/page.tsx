@@ -1,4 +1,4 @@
-// app/admin/utilities/page.tsx - ENHANCED with debug functions - FIXED ESLint errors
+// app/admin/utilities/page.tsx - ENHANCED with product management
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -16,24 +16,39 @@ import {
   Settings,
   Bug,
   RefreshCw,
-  Eye
+  Eye,
+  Package,
+  BookOpen
 } from 'lucide-react'
 import { auth } from '@/lib/firebase'
 import { Button } from '@/components/common/Button'
 import { seedArticlesToFirebase, clearAllArticles } from '@/lib/seed-articles'
+import { seedProductsToFirebase, clearAllProducts, debugProductDatabase } from '@/lib/seed-products'
 import { BlogService } from '@/lib/blog-service'
+import { ProductsService } from '@/lib/products-service'
 import Link from 'next/link'
 
 export default function AdminUtilitiesPage() {
   const [user, loading] = useAuthState(auth)
+  const router = useRouter()
+
+  // Article states
   const [isSeeding, setIsSeeding] = useState(false)
   const [isClearing, setIsClearing] = useState(false)
   const [isDebugging, setIsDebugging] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null)
   const [articleCount, setArticleCount] = useState<number>(0)
   const [isLoadingCount, setIsLoadingCount] = useState(true)
+
+  // Product states
+  const [isSeedingProducts, setIsSeedingProducts] = useState(false)
+  const [isClearingProducts, setIsClearingProducts] = useState(false)
+  const [isDebuggingProducts, setIsDebuggingProducts] = useState(false)
+  const [productCount, setProductCount] = useState<number>(0)
+  const [isLoadingProductCount, setIsLoadingProductCount] = useState(true)
+
+  // Shared states
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null)
   const [debugInfo, setDebugInfo] = useState<string>('')
-  const router = useRouter()
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -42,40 +57,55 @@ export default function AdminUtilitiesPage() {
     }
   }, [user, loading, router])
 
-  // Load current article count
+  // Load current counts
   useEffect(() => {
-    const loadArticleCount = async () => {
-      try {
-        setIsLoadingCount(true)
-        const count = await BlogService.getArticleCount()
-        setArticleCount(count)
-      } catch (err) {
-        console.error('Error loading article count:', err)
-        setMessage({ type: 'error', text: 'Failed to load article count' })
-      } finally {
-        setIsLoadingCount(false)
-      }
-    }
-
     if (user) {
-      loadArticleCount()
+      loadCounts()
     }
   }, [user])
 
-  const refreshCount = async () => {
-    setIsLoadingCount(true)
+  const loadCounts = async () => {
     try {
-      const count = await BlogService.getArticleCount()
-      setArticleCount(count)
-      setMessage({ type: 'success', text: `Refreshed: Found ${count} articles` })
+      setIsLoadingCount(true)
+      setIsLoadingProductCount(true)
+
+      const [articles, products] = await Promise.all([
+        BlogService.getArticleCount(),
+        ProductsService.getProductCount()
+      ])
+
+      setArticleCount(articles)
+      setProductCount(products)
     } catch (err) {
-      console.error('Error refreshing count:', err)
-      setMessage({ type: 'error', text: 'Failed to refresh count' })
+      console.error('Error loading counts:', err)
+      setMessage({ type: 'error', text: 'Failed to load counts' })
     } finally {
       setIsLoadingCount(false)
+      setIsLoadingProductCount(false)
     }
   }
 
+  const refreshCounts = async () => {
+    setIsLoadingCount(true)
+    setIsLoadingProductCount(true)
+    try {
+      const [articles, products] = await Promise.all([
+        BlogService.getArticleCount(),
+        ProductsService.getProductCount()
+      ])
+      setArticleCount(articles)
+      setProductCount(products)
+      setMessage({ type: 'success', text: `Refreshed: Found ${articles} articles, ${products} products` })
+    } catch (err) {
+      console.error('Error refreshing counts:', err)
+      setMessage({ type: 'error', text: 'Failed to refresh counts' })
+    } finally {
+      setIsLoadingCount(false)
+      setIsLoadingProductCount(false)
+    }
+  }
+
+  // ===== ARTICLE HANDLERS =====
   const handleSeedArticles = async () => {
     setIsSeeding(true)
     setMessage(null)
@@ -83,9 +113,7 @@ export default function AdminUtilitiesPage() {
     try {
       await seedArticlesToFirebase()
       setMessage({ type: 'success', text: 'Articles seeded successfully!' })
-      
-      // Refresh article count
-      await refreshCount()
+      await loadCounts()
     } catch (err) {
       console.error('Seeding error:', err)
       setMessage({ type: 'error', text: `Failed to seed articles: ${err}` })
@@ -95,13 +123,7 @@ export default function AdminUtilitiesPage() {
   }
 
   const handleClearArticles = async () => {
-    if (!window.confirm('⚠️ WARNING: This will delete ALL articles from the database. This action cannot be undone. Are you sure?')) {
-      return
-    }
-
-    const confirmText = prompt('Type "DELETE ALL" to confirm:')
-    if (confirmText !== 'DELETE ALL') {
-      setMessage({ type: 'info', text: 'Deletion cancelled' })
+    if (!window.confirm('⚠️ WARNING: This will delete ALL articles from the database. This cannot be undone! Are you sure?')) {
       return
     }
 
@@ -111,7 +133,7 @@ export default function AdminUtilitiesPage() {
     try {
       await clearAllArticles()
       setMessage({ type: 'success', text: 'All articles cleared successfully!' })
-      setArticleCount(0)
+      await loadCounts()
     } catch (err) {
       console.error('Clearing error:', err)
       setMessage({ type: 'error', text: `Failed to clear articles: ${err}` })
@@ -120,27 +142,66 @@ export default function AdminUtilitiesPage() {
     }
   }
 
-  const handleDebugDatabase = async () => {
-    setIsDebugging(true)
-    setDebugInfo('')
+  // ===== PRODUCT HANDLERS =====
+  const handleSeedProducts = async () => {
+    setIsSeedingProducts(true)
     setMessage(null)
 
     try {
-      // Capture console output
-      const originalLog = console.log
-      let debugOutput = ''
-      console.log = (...args) => {
-        debugOutput += args.join(' ') + '\n'
-        originalLog(...args)
-      }
+      await seedProductsToFirebase()
+      setMessage({ type: 'success', text: 'Products seeded successfully!' })
+      await loadCounts()
+    } catch (err) {
+      console.error('Product seeding error:', err)
+      setMessage({ type: 'error', text: `Failed to seed products: ${err}` })
+    } finally {
+      setIsSeedingProducts(false)
+    }
+  }
 
-      await BlogService.debugListAllDocuments()
-      
-      // Restore console.log
-      console.log = originalLog
-      
+  const handleClearProducts = async () => {
+    if (!window.confirm('⚠️ WARNING: This will delete ALL products from the database. This cannot be undone! Are you sure?')) {
+      return
+    }
+
+    setIsClearingProducts(true)
+    setMessage(null)
+
+    try {
+      await clearAllProducts()
+      setMessage({ type: 'success', text: 'All products cleared successfully!' })
+      await loadCounts()
+    } catch (err) {
+      console.error('Product clearing error:', err)
+      setMessage({ type: 'error', text: `Failed to clear products: ${err}` })
+    } finally {
+      setIsClearingProducts(false)
+    }
+  }
+
+  const handleDebugProducts = async () => {
+    setIsDebuggingProducts(true)
+    try {
+      const debugOutput = await debugProductDatabase()
       setDebugInfo(debugOutput)
-      setMessage({ type: 'success', text: 'Debug information collected. Check the output below.' })
+      setMessage({ type: 'info', text: 'Product debug completed - check console and debug section below' })
+    } catch (err) {
+      console.error('Debug error:', err)
+      setMessage({ type: 'error', text: `Debug failed: ${err}` })
+    } finally {
+      setIsDebuggingProducts(false)
+    }
+  }
+
+  const handleDebugDatabase = async () => {
+    setIsDebugging(true)
+    try {
+      // Debug both articles and products
+      console.log('=== DEBUGGING FULL DATABASE ===')
+      await BlogService.debugListAllArticles()
+      const productDebug = await debugProductDatabase()
+      setDebugInfo(productDebug)
+      setMessage({ type: 'info', text: 'Database debug completed - check console for full output' })
     } catch (err) {
       console.error('Debug error:', err)
       setMessage({ type: 'error', text: `Debug failed: ${err}` })
@@ -149,104 +210,89 @@ export default function AdminUtilitiesPage() {
     }
   }
 
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="w-16 h-16 border-4 border-solar-electric/20 border-t-solar-electric rounded-full animate-spin mx-auto mb-4" />
-          <p className="font-tech">Loading utilities...</p>
-        </div>
+        <Loader className="w-8 h-8 animate-spin text-solar-electric" />
       </div>
     )
   }
 
+  // Not authenticated
   if (!user) {
     return null
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon">
-      {/* Background Effects */}
-      <div className="absolute inset-0 tech-grid opacity-20" />
-      
-      {/* Header */}
-      <header className="relative z-10 bg-solar-carbon/95 backdrop-blur-sm border-b border-white/10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Link href="/admin/dashboard">
-                <Button variant="ghost" size="sm" className="mr-4">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-2xl font-racing font-bold text-white">
-                  Database Utilities
-                </h1>
-                <p className="text-white/70 text-sm font-tech">
-                  Manage database content and debug operations
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="relative z-10 container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 py-8">
         
-        {/* Status Message */}
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center mb-4">
+            <Link href="/admin/dashboard" className="mr-4">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+          </div>
+          
+          <h1 className="text-4xl font-racing font-bold text-white mb-2">
+            Admin Utilities
+          </h1>
+          <p className="text-white/70 font-tech">
+            Database management tools and utilities
+          </p>
+        </motion.div>
+
+        {/* Message */}
         {message && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`mb-8 p-4 rounded-lg border ${
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`mb-6 p-4 rounded-lg border flex items-center ${
               message.type === 'success' 
-                ? 'bg-green-500/20 border-green-500/40 text-green-200'
+                ? 'bg-green-500/20 border-green-500/40 text-green-300'
                 : message.type === 'error'
-                ? 'bg-red-500/20 border-red-500/40 text-red-200'
-                : 'bg-blue-500/20 border-blue-500/40 text-blue-200'
+                ? 'bg-red-500/20 border-red-500/40 text-red-300'
+                : 'bg-blue-500/20 border-blue-500/40 text-blue-300'
             }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                {message.type === 'success' && <CheckCircle className="w-5 h-5 mr-3" />}
-                {message.type === 'error' && <AlertTriangle className="w-5 h-5 mr-3" />}
-                <span className="font-tech text-sm">{message.text}</span>
-              </div>
-              <button 
-                onClick={() => setMessage(null)}
-                className="text-current hover:opacity-70"
-              >
-                ×
-              </button>
-            </div>
+            {message.type === 'success' && <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />}
+            {message.type === 'error' && <AlertTriangle className="w-5 h-5 mr-2 flex-shrink-0" />}
+            {message.type === 'info' && <Eye className="w-5 h-5 mr-2 flex-shrink-0" />}
+            <span className="font-tech">{message.text}</span>
           </motion.div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8">
           
           {/* Database Status */}
-          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6"
+          >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <Database className="w-6 h-6 text-solar-electric mr-3" />
                 <h2 className="text-xl font-racing font-bold text-white">Database Status</h2>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={refreshCount}
-                loading={isLoadingCount}
-              >
+              <Button onClick={refreshCounts} variant="outline" size="sm">
                 <RefreshCw className="w-4 h-4" />
               </Button>
             </div>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                <span className="text-white font-tech">Articles in Database:</span>
-                <span className="text-solar-electric font-racing font-bold text-lg">
+                <span className="text-white font-tech">Articles:</span>
+                <span className="text-solar-electric font-tech font-bold text-lg">
                   {isLoadingCount ? (
                     <Loader className="w-5 h-5 animate-spin" />
                   ) : (
@@ -256,11 +302,22 @@ export default function AdminUtilitiesPage() {
               </div>
               
               <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                <span className="text-white font-tech">Products:</span>
+                <span className="text-solar-gold font-tech font-bold text-lg">
+                  {isLoadingProductCount ? (
+                    <Loader className="w-5 h-5 animate-spin" />
+                  ) : (
+                    productCount
+                  )}
+                </span>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
                 <span className="text-white font-tech">Database Status:</span>
                 <span className={`font-tech font-semibold ${
-                  articleCount > 0 ? 'text-green-400' : 'text-yellow-400'
+                  (articleCount > 0 || productCount > 0) ? 'text-green-400' : 'text-yellow-400'
                 }`}>
-                  {articleCount > 0 ? 'Ready' : 'Empty'}
+                  {(articleCount > 0 || productCount > 0) ? 'Ready' : 'Empty'}
                 </span>
               </div>
 
@@ -268,16 +325,15 @@ export default function AdminUtilitiesPage() {
                 <span className="text-white font-tech">Connection:</span>
                 <span className="text-green-400 font-tech font-semibold">Connected</span>
               </div>
-
-              <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                <span className="text-white font-tech">Firebase Project:</span>
-                <span className="text-white/80 font-tech text-sm">ensten-website</span>
-              </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Operations */}
-          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6"
+          >
             <div className="flex items-center mb-6">
               <Settings className="w-6 h-6 text-solar-gold mr-3" />
               <h2 className="text-xl font-racing font-bold text-white">Operations</h2>
@@ -285,117 +341,215 @@ export default function AdminUtilitiesPage() {
             
             <div className="space-y-4">
               
-              {/* Seed Articles */}
-              <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="text-white font-tech font-semibold mb-1">Seed Sample Articles</h3>
-                    <p className="text-white/70 text-sm font-tech">
-                      Add 3 sample articles to get started. Safe to run multiple times.
-                    </p>
+              {/* === ARTICLE OPERATIONS === */}
+              <div className="border-b border-white/10 pb-4">
+                <h3 className="text-white font-tech font-semibold mb-3 flex items-center">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Article Management
+                </h3>
+                
+                <div className="space-y-3">
+                  {/* Seed Articles */}
+                  <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-white font-tech font-semibold text-sm">Seed Sample Articles</h4>
+                        <p className="text-blue-300 text-xs font-tech">
+                          Add sample articles to get started
+                        </p>
+                      </div>
+                      <Upload className="w-4 h-4 text-blue-400 mt-0.5" />
+                    </div>
+                    <Button
+                      onClick={handleSeedArticles}
+                      loading={isSeeding}
+                      variant="primary"
+                      size="sm"
+                      fullWidth
+                      disabled={isSeeding}
+                    >
+                      {isSeeding ? 'Seeding...' : 'Seed Articles'}
+                    </Button>
                   </div>
-                  <Upload className="w-5 h-5 text-solar-electric mt-1" />
+
+                  {/* Clear Articles */}
+                  <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/30">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-white font-tech font-semibold text-sm">Clear All Articles</h4>
+                        <p className="text-red-300 text-xs font-tech">
+                          ⚠️ Permanently deletes all articles
+                        </p>
+                      </div>
+                      <Trash2 className="w-4 h-4 text-red-400 mt-0.5" />
+                    </div>
+                    <Button
+                      onClick={handleClearArticles}
+                      loading={isClearing}
+                      variant="racing"
+                      size="sm"
+                      fullWidth
+                      disabled={isClearing || articleCount === 0}
+                    >
+                      {isClearing ? 'Clearing...' : 'Clear Articles'}
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  onClick={handleSeedArticles}
-                  loading={isSeeding}
-                  variant="primary"
-                  size="sm"
-                  fullWidth
-                  disabled={isSeeding}
-                >
-                  {isSeeding ? 'Seeding...' : 'Seed Articles'}
-                </Button>
               </div>
 
-              {/* Debug Database */}
-              <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="text-white font-tech font-semibold mb-1">Debug Database</h3>
-                    <p className="text-blue-300 text-sm font-tech">
-                      See what&apos;s actually in your Firestore database
-                    </p>
+              {/* === PRODUCT OPERATIONS === */}
+              <div className="border-b border-white/10 pb-4">
+                <h3 className="text-white font-tech font-semibold mb-3 flex items-center">
+                  <Package className="w-4 h-4 mr-2" />
+                  Product Management
+                </h3>
+                
+                <div className="space-y-3">
+                  {/* Seed Products */}
+                  <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/30">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-white font-tech font-semibold text-sm">Seed Sample Products</h4>
+                        <p className="text-green-300 text-xs font-tech">
+                          Add sample products to get started
+                        </p>
+                      </div>
+                      <Upload className="w-4 h-4 text-green-400 mt-0.5" />
+                    </div>
+                    <Button
+                      onClick={handleSeedProducts}
+                      loading={isSeedingProducts}
+                      variant="primary"
+                      size="sm"
+                      fullWidth
+                      disabled={isSeedingProducts}
+                    >
+                      {isSeedingProducts ? 'Seeding...' : 'Seed Products'}
+                    </Button>
                   </div>
-                  <Bug className="w-5 h-5 text-blue-400 mt-1" />
+
+                  {/* Clear Products */}
+                  <div className="p-3 bg-red-500/10 rounded-lg border border-red-500/30">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-white font-tech font-semibold text-sm">Clear All Products</h4>
+                        <p className="text-red-300 text-xs font-tech">
+                          ⚠️ Permanently deletes all products
+                        </p>
+                      </div>
+                      <Trash2 className="w-4 h-4 text-red-400 mt-0.5" />
+                    </div>
+                    <Button
+                      onClick={handleClearProducts}
+                      loading={isClearingProducts}
+                      variant="racing"
+                      size="sm"
+                      fullWidth
+                      disabled={isClearingProducts || productCount === 0}
+                    >
+                      {isClearingProducts ? 'Clearing...' : 'Clear Products'}
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  onClick={handleDebugDatabase}
-                  loading={isDebugging}
-                  variant="outline"
-                  size="sm"
-                  fullWidth
-                  disabled={isDebugging}
-                >
-                  {isDebugging ? 'Debugging...' : 'Debug Database'}
-                </Button>
               </div>
 
-              {/* Clear Articles */}
-              <div className="p-4 bg-red-500/10 rounded-lg border border-red-500/30">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="text-white font-tech font-semibold mb-1">Clear All Articles</h3>
-                    <p className="text-red-300 text-sm font-tech">
-                      ⚠️ Permanently deletes all articles. Cannot be undone!
-                    </p>
+              {/* === DEBUG OPERATIONS === */}
+              <div>
+                <h3 className="text-white font-tech font-semibold mb-3 flex items-center">
+                  <Bug className="w-4 h-4 mr-2" />
+                  Debug Tools
+                </h3>
+                
+                <div className="space-y-3">
+                  {/* Debug Full Database */}
+                  <div className="p-3 bg-purple-500/10 rounded-lg border border-purple-500/30">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-white font-tech font-semibold text-sm">Debug Full Database</h4>
+                        <p className="text-purple-300 text-xs font-tech">
+                          See all data in Firestore
+                        </p>
+                      </div>
+                      <Bug className="w-4 h-4 text-purple-400 mt-0.5" />
+                    </div>
+                    <Button
+                      onClick={handleDebugDatabase}
+                      loading={isDebugging}
+                      variant="outline"
+                      size="sm"
+                      fullWidth
+                      disabled={isDebugging}
+                    >
+                      {isDebugging ? 'Debugging...' : 'Debug Database'}
+                    </Button>
                   </div>
-                  <Trash2 className="w-5 h-5 text-red-400 mt-1" />
-                </div>
-                <Button
-                  onClick={handleClearArticles}
-                  loading={isClearing}
-                  variant="racing"
-                  size="sm"
-                  fullWidth
-                  disabled={isClearing || articleCount === 0}
-                >
-                  {isClearing ? 'Clearing...' : 'Clear All Articles'}
-                </Button>
-              </div>
 
+                  {/* Debug Products Only */}
+                  <div className="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/30">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-white font-tech font-semibold text-sm">Debug Products Only</h4>
+                        <p className="text-yellow-300 text-xs font-tech">
+                          See product collection details
+                        </p>
+                      </div>
+                      <Package className="w-4 h-4 text-yellow-400 mt-0.5" />
+                    </div>
+                    <Button
+                      onClick={handleDebugProducts}
+                      loading={isDebuggingProducts}
+                      variant="outline"
+                      size="sm"
+                      fullWidth
+                      disabled={isDebuggingProducts}
+                    >
+                      {isDebuggingProducts ? 'Debugging...' : 'Debug Products'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Debug Output */}
         {debugInfo && (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-8 max-w-6xl mx-auto"
+            className="mt-8 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6"
           >
-            <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
-              <div className="flex items-center mb-4">
-                <Eye className="w-5 h-5 text-solar-electric mr-3" />
-                <h2 className="text-lg font-racing font-bold text-white">Debug Output</h2>
-              </div>
-              <div className="bg-black/50 rounded-lg p-4 border border-white/10">
-                <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap overflow-x-auto">
-                  {debugInfo}
-                </pre>
-              </div>
+            <div className="flex items-center mb-4">
+              <Bug className="w-6 h-6 text-purple-400 mr-3" />
+              <h2 className="text-xl font-racing font-bold text-white">Debug Output</h2>
             </div>
+            <pre className="bg-black/50 p-4 rounded-lg text-green-400 font-mono text-sm overflow-x-auto whitespace-pre-wrap">
+              {debugInfo}
+            </pre>
           </motion.div>
         )}
 
-        {/* Instructions */}
+        {/* Help Section */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-12 max-w-6xl mx-auto"
+          transition={{ delay: 0.2 }}
+          className="mt-8 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6"
         >
-          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
-            <h2 className="text-lg font-racing font-bold text-white mb-4">Troubleshooting Steps</h2>
-            <div className="space-y-3 text-white/80 font-tech text-sm">
+          <div className="flex items-center mb-4">
+            <AlertTriangle className="w-6 h-6 text-solar-gold mr-3" />
+            <h2 className="text-xl font-racing font-bold text-white">Usage Guide</h2>
+          </div>
+          
+          <div className="text-white/80 font-tech space-y-4">
+            <div className="space-y-3">
               <div className="flex items-start">
                 <div className="w-6 h-6 bg-solar-electric/20 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
                   <span className="text-solar-electric font-bold text-xs">1</span>
                 </div>
                 <p>
-                  <strong>If articles won&apos;t delete/edit:</strong> Click &quot;Debug Database&quot; to see what&apos;s actually stored, 
-                  then compare the IDs shown in the admin panel.
+                  <strong>For new installations:</strong> Use &quot;Seed Sample Articles&quot; and &quot;Seed Sample Products&quot; 
+                  to populate your database with example content.
                 </p>
               </div>
               <div className="flex items-start">
@@ -403,7 +557,7 @@ export default function AdminUtilitiesPage() {
                   <span className="text-solar-electric font-bold text-xs">2</span>
                 </div>
                 <p>
-                  <strong>If you have broken articles:</strong> Use &quot;Clear All Articles&quot; and then &quot;Seed Articles&quot; 
+                  <strong>If you have broken data:</strong> Use &quot;Clear All&quot; followed by &quot;Seed&quot; 
                   to start fresh with working content.
                 </p>
               </div>
@@ -412,8 +566,8 @@ export default function AdminUtilitiesPage() {
                   <span className="text-solar-electric font-bold text-xs">3</span>
                 </div>
                 <p>
-                  <strong>Check the browser console:</strong> All operations now have detailed logging 
-                  to help identify Firebase issues.
+                  <strong>For troubleshooting:</strong> Use debug tools to see exactly what&apos;s in your database. 
+                  Check the browser console for detailed logging.
                 </p>
               </div>
             </div>

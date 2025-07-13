@@ -5,6 +5,7 @@ import {
   getDocs, 
   getDoc, 
   updateDoc, 
+  deleteDoc,
   query, 
   orderBy,
   serverTimestamp,
@@ -149,6 +150,29 @@ export class ProductsService {
     }
   }
 
+  // Clear all products from Firebase (utility function)
+  static async clearAllProducts(): Promise<boolean> {
+    try {
+      console.log('🗑️ Clearing all products from Firebase...')
+      
+      const querySnapshot = await getDocs(collection(db, COLLECTION_NAME))
+      console.log(`📊 Found ${querySnapshot.size} products to delete`)
+      
+      const deletePromises = querySnapshot.docs.map(docSnapshot => {
+        console.log(`🗑️ Deleting product: ${docSnapshot.id} (${docSnapshot.data().name})`)
+        return deleteDoc(doc(db, COLLECTION_NAME, docSnapshot.id))
+      })
+      
+      await Promise.all(deletePromises)
+      console.log('✅ All products cleared successfully!')
+      return true
+      
+    } catch (error) {
+      console.error('❌ Error clearing products:', error)
+      throw error
+    }
+  }
+
   // Get product count
   static async getProductCount(): Promise<number> {
     try {
@@ -189,13 +213,64 @@ export class ProductsService {
       const querySnapshot = await getDocs(collection(db, COLLECTION_NAME))
       console.log('📊 Total products:', querySnapshot.size)
       
+      if (querySnapshot.empty) {
+        console.log('❌ No products found in Firebase collection')
+        console.log('💡 Try seeding products first')
+        return
+      }
+      
       querySnapshot.forEach((doc) => {
+        const data = doc.data()
         console.log('📦 Product ID:', doc.id)
-        console.log('📝 Product data:', doc.data())
+        console.log('📝 Product data:', {
+          name: data.name,
+          category: data.category,
+          availability: data.availability,
+          price: data.price,
+          createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString() : 'No date'
+        })
         console.log('---')
       })
     } catch (error) {
       console.error('❌ Debug error:', error)
+    }
+  }
+
+  // Create new product (for future use)
+  static async createProduct(product: Omit<Product, 'id'>): Promise<string | null> {
+    try {
+      // Generate a clean ID
+      const productId = `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      console.log('📝 Creating product with ID:', productId)
+      
+      const productData = {
+        ...product,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+      
+      const docRef = doc(db, COLLECTION_NAME, productId)
+      await setDoc(docRef, productData)
+      
+      console.log('✅ Product created successfully with ID:', productId)
+      return productId
+    } catch (error) {
+      console.error('❌ Error creating product:', error)
+      throw error
+    }
+  }
+
+  // Delete product (for future use)
+  static async deleteProduct(id: string): Promise<boolean> {
+    try {
+      console.log('🗑️ Deleting product with ID:', id)
+      const docRef = doc(db, COLLECTION_NAME, id)
+      await deleteDoc(docRef)
+      console.log('✅ Product deleted successfully')
+      return true
+    } catch (error) {
+      console.error('❌ Error deleting product:', error)
+      throw error
     }
   }
 }

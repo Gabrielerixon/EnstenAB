@@ -43,7 +43,9 @@ export default function Home() {
       <Hero />
       
 
-      {/* NY SEKTION: Solar Vehicles Showcase - Ersätter BWSC */}
+      
+
+      {/* Solar Vehicles Showcase - UPPDATERAD MED RIKTIG BILD */}
       <section className="relative py-24 bg-gradient-to-r from-solar-slate via-solar-carbon to-solar-slate">
         <div className="absolute inset-0 solar-pattern opacity-10" />
         
@@ -93,7 +95,7 @@ export default function Home() {
               </Link>
             </motion.div>
 
-            {/* Solar Vehicles Showcase */}
+            {/* Solar Vehicles Showcase - NY BILDSEKTION */}
             <motion.div
               initial={{ opacity: 0, ...(isMobile ? {} : { x: 50 }) }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -102,34 +104,54 @@ export default function Home() {
               className="relative"
             >
               <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl border border-white/20 p-8">
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Solar Car */}
-                  <div className="aspect-square bg-gradient-to-br from-solar-electric/20 to-solar-gold/20 rounded-lg overflow-hidden relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Car className="w-16 h-16 text-solar-electric" />
-                    </div>
-                    <div className="absolute bottom-2 left-2 right-2">
-                      <p className="text-white font-tech text-sm font-semibold">Solar Cars</p>
-                    </div>
-                  </div>
+                
+                {/* Huvudbild */}
+                <div className="relative aspect-video rounded-lg overflow-hidden mb-6">
+                  <Image
+                    src="/images/gallery/solar-vehicles.png" // <- ÄNDRA FILNAMNET HÄR
+                    alt="Solar vehicles - cars and boats powered by Ensten control systems"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={false} // Kan sättas till true om bilden är viktig för LCP
+                  />
                   
-                  {/* Solar Boat */}
-                  <div className="aspect-square bg-gradient-to-br from-solar-gold/20 to-solar-racing/20 rounded-lg overflow-hidden relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Ship className="w-16 h-16 text-solar-gold" />
-                    </div>
-                    <div className="absolute bottom-2 left-2 right-2">
-                      <p className="text-white font-tech text-sm font-semibold">Solar Boats</p>
-                    </div>
-                  </div>
+                  {/* Mörk overlay för bättre textkontrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                   
-                  {/* Combined showcase */}
-                  <div className="col-span-2 bg-gradient-to-r from-solar-racing/20 to-solar-electric/20 rounded-lg p-4">
-                    <div className="text-center">
-                      <h3 className="text-white font-racing font-bold mb-2">Universal Control Systems</h3>
-                      <p className="text-white/80 font-tech text-sm">
-                        One platform, multiple vehicle types. Our systems adapt to your racing needs.
-                      </p>
+                  {/* Kategorimärken */}
+                  <div className="absolute top-4 left-4 flex space-x-2">
+                    <span className="bg-solar-electric/80 text-white px-3 py-1 rounded-full text-xs font-tech font-semibold backdrop-blur-sm">
+                      Solar Cars
+                    </span>
+                    <span className="bg-solar-gold/80 text-white px-3 py-1 rounded-full text-xs font-tech font-semibold backdrop-blur-sm">
+                      Solar Boats
+                    </span>
+                  </div>
+                </div>
+
+                {/* Info-sektion under bilden */}
+                <div className="bg-gradient-to-r from-solar-racing/20 to-solar-electric/20 rounded-lg p-6">
+                  <div className="text-center">
+                    <h3 className="text-white font-racing font-bold text-xl mb-3">
+                      Universal Control Systems
+                    </h3>
+                    <p className="text-white/90 font-tech text-sm leading-relaxed">
+                      One platform, multiple vehicle types. Our systems adapt to your racing needs 
+                      across all solar-powered competition formats.
+                    </p>
+                    
+                    {/* Extra info-punkter */}
+                    <div className="mt-4 flex flex-wrap justify-center gap-2">
+                      <span className="bg-white/10 text-white/80 px-2 py-1 rounded text-xs font-tech">
+                        Race Approved
+                      </span>
+                      <span className="bg-white/10 text-white/80 px-2 py-1 rounded text-xs font-tech">
+                        Multi-Vehicle
+                      </span>
+                      <span className="bg-white/10 text-white/80 px-2 py-1 rounded text-xs font-tech">
+                        Championship Ready
+                      </span>
                     </div>
                   </div>
                 </div>

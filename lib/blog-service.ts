@@ -207,6 +207,40 @@ export class BlogService {
     }
   }
 
+  
+// lib/blog-service.ts - Add missing debugListAllArticles function
+// Add this to the existing BlogService class:
+
+// Debug function to list all articles (alias for debugListAllDocuments)
+static async debugListAllArticles(): Promise<void> {
+  try {
+    console.log('🔍 DEBUG: Listing all articles in collection...')
+    const querySnapshot = await getDocs(collection(db, COLLECTION_NAME))
+    console.log('📊 Total articles:', querySnapshot.size)
+    
+    if (querySnapshot.empty) {
+      console.log('❌ No articles found in Firebase collection')
+      console.log('💡 Try seeding articles first')
+      return
+    }
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data()
+      console.log('📄 Article ID:', doc.id)
+      console.log('📝 Article data:', {
+        title: data.title,
+        category: data.category,
+        author: data.author?.name || 'Unknown',
+        publishedAt: data.publishedAt ? new Date(data.publishedAt.seconds * 1000).toLocaleString() : 'No date',
+        tags: data.tags || []
+      })
+      console.log('---')
+    })
+  } catch (error) {
+    console.error('❌ Debug error:', error)
+  }
+}
+
   // Get article count (for dashboard stats)
   static async getArticleCount(): Promise<number> {
     try {

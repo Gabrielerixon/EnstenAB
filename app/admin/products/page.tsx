@@ -1,10 +1,10 @@
-// app/admin/products/page.tsx
+// app/admin/products/page.tsx - COMPLETE version for editing products
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ArrowLeft, 
   Package, 
@@ -15,7 +15,9 @@ import {
   AlertCircle,
   RefreshCw,
   Eye,
-  Tag
+  Tag,
+  Loader,
+  Monitor
 } from 'lucide-react'
 import { auth } from '@/lib/firebase'
 import { Button } from '@/components/common/Button'
@@ -94,21 +96,10 @@ export default function AdminProductsPage() {
         
         setMessage({ type: 'success', text: 'Product updated successfully!' })
         setEditingProduct(null)
-        
-        // Auto-hide success message
-        setTimeout(() => setMessage(null), 3000)
-      } else {
-        throw new Error('Update failed')
       }
     } catch (error) {
       console.error('Error updating product:', error)
-      setMessage({ type: 'error', text: 'Failed to update product. Changes saved locally only.' })
-      
-      // Still update local state as fallback
-      setProducts(prev => prev.map(p => 
-        p.id === editingProduct.id ? editingProduct : p
-      ))
-      setEditingProduct(null)
+      setMessage({ type: 'error', text: 'Failed to update product' })
     } finally {
       setIsSaving(false)
     }
@@ -116,340 +107,379 @@ export default function AdminProductsPage() {
 
   const handleCancel = () => {
     setEditingProduct(null)
-    setMessage(null)
   }
 
-  const updateEditingProduct = (field: keyof Product, value: any) => {
+  const handleInputChange = (field: keyof Product, value: string) => {
     if (!editingProduct) return
-    setEditingProduct(prev => prev ? { ...prev, [field]: value } : null)
+    
+    setEditingProduct(prev => prev ? {
+      ...prev,
+      [field]: value
+    } : null)
   }
 
-  if (loading || isLoadingProducts) {
+  // Loading state
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="w-16 h-16 border-4 border-solar-electric/20 border-t-solar-electric rounded-full animate-spin mx-auto mb-4" />
-          <p className="font-tech">{loading ? 'Loading...' : 'Loading products...'}</p>
-        </div>
+        <Loader className="w-8 h-8 animate-spin text-solar-electric" />
       </div>
     )
   }
 
+  // Not authenticated
   if (!user) {
     return null
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-solar-carbon via-solar-slate to-solar-carbon">
-      {/* Background Effects */}
-      <div className="absolute inset-0 tech-grid opacity-20" />
-      
-      {/* Header */}
-      <header className="relative z-10 bg-solar-carbon/95 backdrop-blur-sm border-b border-white/10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+      <main className="container mx-auto px-4 py-8">
+        
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <Link href="/admin/dashboard">
-                <Button variant="ghost" size="sm" className="mr-4">
+              <Link href="/admin/dashboard" className="mr-4">
+                <Button variant="outline" size="sm">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Dashboard
+                  Back to Dashboard
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-racing font-bold text-white">
-                  Product Management
-                </h1>
-                <p className="text-white/70 text-sm font-tech">
-                  Manage product availability and information
-                </p>
-              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <Button onClick={loadProducts} variant="outline" size="sm" disabled={isLoadingProducts}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingProducts ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              
+              <Link href="/products">
+                <Button variant="outline" size="sm">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Live
+                </Button>
+              </Link>
             </div>
           </div>
-        </div>
-      </header>
+          
+          <h1 className="text-4xl font-racing font-bold text-white mb-2">
+            Product Management
+          </h1>
+          <p className="text-white/70 font-tech">
+            Edit product information and availability status
+          </p>
+        </motion.div>
 
-      <main className="relative z-10 container mx-auto px-6 py-8">
-        
-        {/* Status Message */}
+        {/* Message */}
         {message && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`mb-6 p-4 rounded-lg border ${
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`mb-6 p-4 rounded-lg border flex items-center ${
               message.type === 'success' 
-                ? 'bg-green-500/20 border-green-500/40 text-green-200'
-                : 'bg-red-500/20 border-red-500/40 text-red-200'
+                ? 'bg-green-500/20 border-green-500/40 text-green-300'
+                : 'bg-red-500/20 border-red-500/40 text-red-300'
             }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                {message.type === 'success' ? (
-                  <CheckCircle className="w-5 h-5 mr-3" />
-                ) : (
-                  <AlertCircle className="w-5 h-5 mr-3" />
-                )}
-                <span className="font-tech text-sm">{message.text}</span>
-              </div>
-              <button 
-                onClick={() => setMessage(null)}
-                className="text-current hover:opacity-70"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            {message.type === 'success' ? (
+              <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+            )}
+            <span className="font-tech">{message.text}</span>
+            <button 
+              onClick={() => setMessage(null)}
+              className="ml-auto text-white/60 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </motion.div>
         )}
 
-        {/* Products Overview */}
-        <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <Package className="w-6 h-6 text-solar-electric mr-3" />
-              <h2 className="text-xl font-racing font-bold text-white">Product Catalog</h2>
-            </div>
-            <div className="text-white/70 font-tech text-sm">
-              {products.length} products total
-            </div>
-          </div>
-
-          {/* Products Grid */}
-          <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <motion.div
-                key={product.id}
-                layout
-                className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden hover:border-white/40 transition-all duration-300"
-              >
-                {/* Product Image */}
-                <div className="h-48 bg-gradient-to-br from-solar-electric/10 to-solar-gold/10 relative overflow-hidden">
-                  <Image
-                    src={product.thumbnailPath}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = `
-                          <div class="w-full h-full flex items-center justify-center">
-                            <div class="w-16 h-16 bg-solar-gradient rounded-lg flex items-center justify-center">
-                              <span class="text-white font-racing font-bold text-lg">
-                                ${product.name.substring(0, 2)}
-                              </span>
-                            </div>
-                          </div>
-                        `;
-                      }
-                    }}
-                  />
-                  
-                  {/* Availability Badge */}
-                  <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-tech font-semibold border ${availabilityColors[product.availability]}`}>
-                    {availabilityLabels[product.availability]}
-                  </div>
-                </div>
-
-                {/* Product Info */}
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h3 className="text-lg font-racing font-bold text-white">
-                        {product.name}
-                      </h3>
-                      <p className="text-solar-electric font-tech text-sm">
-                        {product.category === 'control-unit' ? 'Control Unit' :
-                         product.category === 'solar-panel' ? 'Solar System' : 'Accessory'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Link href={`/products/${product.id}`} target="_blank">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </Link>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => handleEdit(product)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <p className="text-white/70 font-tech text-sm mb-3 line-clamp-2">
-                    {product.shortDescription}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-solar-gold font-tech font-semibold text-sm">
-                      {product.price}
-                    </span>
-                    <span className="text-white/60 font-tech text-xs">
-                      ID: {product.id}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Edit Modal */}
-        {editingProduct && (
+        {/* Products Loading */}
+        {isLoadingProducts && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="flex items-center justify-center py-12"
           >
-            {/* Backdrop */}
-            <div 
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={handleCancel}
-            />
-            
-            {/* Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="relative bg-gradient-to-b from-solar-carbon to-solar-slate rounded-xl border border-white/20 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-racing font-bold text-white">
-                  Edit Product: {editingProduct.name}
-                </h3>
-                <Button variant="ghost" size="sm" onClick={handleCancel}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-6">
-                {/* Basic Info */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white font-tech font-semibold mb-2">
-                      Product Name
-                    </label>
-                    <input
-                      type="text"
-                      value={editingProduct.name}
-                      onChange={(e) => updateEditingProduct('name', e.target.value)}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-white font-tech font-semibold mb-2">
-                      Category
-                    </label>
-                    <select
-                      value={editingProduct.category}
-                      onChange={(e) => updateEditingProduct('category', e.target.value)}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric"
-                    >
-                      <option value="control-unit" className="bg-solar-carbon">Control Unit</option>
-                      <option value="solar-panel" className="bg-solar-carbon">Solar Panel</option>
-                      <option value="accessory" className="bg-solar-carbon">Accessory</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Availability & Price */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-white font-tech font-semibold mb-2">
-                      Availability Status *
-                    </label>
-                    <select
-                      value={editingProduct.availability}
-                      onChange={(e) => updateEditingProduct('availability', e.target.value as ProductAvailability)}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric"
-                    >
-                      <option value="available" className="bg-solar-carbon">In Stock</option>
-                      <option value="pre-order" className="bg-solar-carbon">Pre-Order</option>
-                      <option value="coming-soon" className="bg-solar-carbon">Coming Soon</option>
-                      <option value="discontinued" className="bg-solar-carbon">Discontinued</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-white font-tech font-semibold mb-2">
-                      Price
-                    </label>
-                    <input
-                      type="text"
-                      value={editingProduct.price}
-                      onChange={(e) => updateEditingProduct('price', e.target.value)}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric"
-                      placeholder="Contact for Pricing"
-                    />
-                  </div>
-                </div>
-
-                {/* Tagline */}
-                <div>
-                  <label className="block text-white font-tech font-semibold mb-2">
-                    Tagline
-                  </label>
-                  <input
-                    type="text"
-                    value={editingProduct.tagline}
-                    onChange={(e) => updateEditingProduct('tagline', e.target.value)}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric"
-                  />
-                </div>
-
-                {/* Short Description */}
-                <div>
-                  <label className="block text-white font-tech font-semibold mb-2">
-                    Short Description
-                  </label>
-                  <textarea
-                    value={editingProduct.shortDescription}
-                    onChange={(e) => updateEditingProduct('shortDescription', e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white font-tech focus:outline-none focus:border-solar-electric resize-none"
-                  />
-                </div>
-
-                {/* Current Highlights */}
-                <div>
-                  <label className="block text-white font-tech font-semibold mb-2">
-                    Product Highlights
-                  </label>
-                  <div className="space-y-2">
-                    {editingProduct.highlights.map((highlight, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-solar-electric" />
-                        <span className="text-white/80 font-tech text-sm">{highlight}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t border-white/20">
-                  <Button
-                    onClick={handleSave}
-                    variant="primary"
-                    loading={isSaving}
-                    icon={<Save className="w-4 h-4" />}
-                    className="flex-1"
-                  >
-                    {isSaving ? 'Saving...' : 'Save Changes'}
-                  </Button>
-                  <Button
-                    onClick={handleCancel}
-                    variant="ghost"
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
+            <Loader className="w-8 h-8 animate-spin text-solar-electric mr-3" />
+            <span className="text-white font-tech">Loading products...</span>
           </motion.div>
         )}
+
+        {/* Products List */}
+        {!isLoadingProducts && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            {products.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 text-white/30 mx-auto mb-4" />
+                <h3 className="text-xl font-tech font-semibold text-white mb-2">No Products Found</h3>
+                <p className="text-white/60 font-tech mb-6">
+                  There are no products in the database. Try seeding some sample products first.
+                </p>
+                <Link href="/admin/utilities">
+                  <Button variant="primary">
+                    <Monitor className="w-4 h-4 mr-2" />
+                    Go to Utilities
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              products.map((product) => (
+                <motion.div
+                  key={product.id}
+                  layout
+                  className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start space-x-4">
+                      {/* Product Image */}
+                      <div className="relative w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+                        {product.thumbnailPath ? (
+                          <Image
+                            src={product.thumbnailPath}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Package className="w-8 h-8 text-white/40" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Product Info */}
+                      <div>
+                        <h3 className="text-xl font-tech font-bold text-white mb-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-white/60 font-tech text-sm mb-2">
+                          {product.tagline}
+                        </p>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-xs font-tech text-white/50">
+                            ID: {product.id}
+                          </span>
+                          <span className="text-xs font-tech text-white/50">
+                            Category: {product.category}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status & Actions */}
+                    <div className="flex items-center space-x-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-tech font-semibold border ${
+                        availabilityColors[product.availability]
+                      }`}>
+                        {availabilityLabels[product.availability]}
+                      </span>
+                      
+                      {editingProduct?.id === product.id ? (
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            onClick={handleSave}
+                            loading={isSaving}
+                            variant="primary"
+                            size="sm"
+                            disabled={isSaving}
+                          >
+                            <Save className="w-4 h-4 mr-1" />
+                            Save
+                          </Button>
+                          <Button
+                            onClick={handleCancel}
+                            variant="outline"
+                            size="sm"
+                            disabled={isSaving}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          onClick={() => handleEdit(product)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Edit Form */}
+                  <AnimatePresence>
+                    {editingProduct?.id === product.id && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="border-t border-white/10 pt-4 mt-4"
+                      >
+                        <div className="grid md:grid-cols-2 gap-4">
+                          
+                          {/* Basic Info */}
+                          <div className="space-y-4">
+                            <h4 className="text-white font-tech font-semibold mb-3 flex items-center">
+                              <Tag className="w-4 h-4 mr-2" />
+                              Basic Information
+                            </h4>
+                            
+                            <div>
+                              <label className="block text-white/70 font-tech text-sm mb-1">
+                                Product Name
+                              </label>
+                              <input
+                                type="text"
+                                value={editingProduct.name}
+                                onChange={(e) => handleInputChange('name', e.target.value)}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white font-tech focus:outline-none focus:border-solar-electric"
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="block text-white/70 font-tech text-sm mb-1">
+                                Tagline
+                              </label>
+                              <input
+                                type="text"
+                                value={editingProduct.tagline}
+                                onChange={(e) => handleInputChange('tagline', e.target.value)}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white font-tech focus:outline-none focus:border-solar-electric"
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="block text-white/70 font-tech text-sm mb-1">
+                                Price
+                              </label>
+                              <input
+                                type="text"
+                                value={editingProduct.price || ''}
+                                onChange={(e) => handleInputChange('price', e.target.value)}
+                                placeholder="e.g. Contact for Pricing"
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white font-tech focus:outline-none focus:border-solar-electric"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Status & Category */}
+                          <div className="space-y-4">
+                            <h4 className="text-white font-tech font-semibold mb-3 flex items-center">
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              Status & Category
+                            </h4>
+                            
+                            <div>
+                              <label className="block text-white/70 font-tech text-sm mb-1">
+                                Availability Status
+                              </label>
+                              <select
+                                value={editingProduct.availability}
+                                onChange={(e) => handleInputChange('availability', e.target.value)}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white font-tech focus:outline-none focus:border-solar-electric"
+                              >
+                                <option value="available" className="bg-solar-carbon text-white">Available</option>
+                                <option value="pre-order" className="bg-solar-carbon text-white">Pre-Order</option>
+                                <option value="coming-soon" className="bg-solar-carbon text-white">Coming Soon</option>
+                                <option value="discontinued" className="bg-solar-carbon text-white">Discontinued</option>
+                              </select>
+                            </div>
+                            
+                            <div>
+                              <label className="block text-white/70 font-tech text-sm mb-1">
+                                Category
+                              </label>
+                              <select
+                                value={editingProduct.category}
+                                onChange={(e) => handleInputChange('category', e.target.value)}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white font-tech focus:outline-none focus:border-solar-electric"
+                              >
+                                <option value="control-unit" className="bg-solar-carbon text-white">Control Unit</option>
+                                <option value="solar-panel" className="bg-solar-carbon text-white">Solar Panel</option>
+                                <option value="accessory" className="bg-solar-carbon text-white">Accessory</option>
+                              </select>
+                            </div>
+                            
+                            <div>
+                              <label className="block text-white/70 font-tech text-sm mb-1">
+                                Short Description
+                              </label>
+                              <textarea
+                                value={editingProduct.shortDescription}
+                                onChange={(e) => handleInputChange('shortDescription', e.target.value)}
+                                rows={3}
+                                className="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-white font-tech focus:outline-none focus:border-solar-electric resize-none"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Save/Cancel Actions */}
+                        <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-white/10">
+                          <Button
+                            onClick={handleCancel}
+                            variant="outline"
+                            size="sm"
+                            disabled={isSaving}
+                          >
+                            Cancel Changes
+                          </Button>
+                          <Button
+                            onClick={handleSave}
+                            loading={isSaving}
+                            variant="primary"
+                            size="sm"
+                          >
+                            {isSaving ? 'Saving...' : 'Save Changes'}
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+        )}
+
+        {/* Help Section */}
+        {!isLoadingProducts && products.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6"
+          >
+            <div className="flex items-center mb-4">
+              <AlertCircle className="w-6 h-6 text-solar-gold mr-3" />
+              <h2 className="text-xl font-racing font-bold text-white">Product Management Guide</h2>
+            </div>
+            
+            <div className="text-white/80 font-tech space-y-2">
+              <p>• <strong>Availability Status:</strong> Controls how products appear on the public site</p>
+              <p>• <strong>Available:</strong> Product is in stock and ready to purchase</p>
+              <p>• <strong>Pre-Order:</strong> Product can be pre-ordered</p>
+              <p>• <strong>Coming Soon:</strong> Product is announced but not yet available</p>
+              <p>• <strong>Discontinued:</strong> Product is no longer available</p>
+              <p>• Changes are saved immediately to Firebase and reflected on the live site</p>
+            </div>
+          </motion.div>
+        )}
+
       </main>
     </div>
   )

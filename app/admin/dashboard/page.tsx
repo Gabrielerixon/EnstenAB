@@ -1,4 +1,4 @@
-// app/admin/dashboard/page.tsx - UPDATED with real stats and no fake analytics
+// app/admin/dashboard/page.tsx - CLEAN VERSION - bara Quick Actions
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -11,16 +11,15 @@ import { BlogService } from '@/lib/blog-service'
 import { ProductsService } from '@/lib/products-service'
 import { 
   BookOpen, 
-  Users, 
   Settings, 
-  Mail, 
   LogOut,
   Plus,
   Eye,
   Edit,
   Database,
   RefreshCw,
-  Package
+  Package,
+  BarChart3
 } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import Link from 'next/link'
@@ -28,26 +27,14 @@ import Link from 'next/link'
 interface DashboardStats {
   totalArticles: number
   totalProducts: number
-  totalContacts: number
-  lastLogin: string
-}
-
-interface RecentArticle {
-  id: string
-  title: string
-  status: 'Published' | 'Draft'
-  publishedAt: string
 }
 
 export default function AdminDashboardPage() {
   const [user, loading] = useAuthState(auth)
   const [stats, setStats] = useState<DashboardStats>({
     totalArticles: 0,
-    totalProducts: 0,
-    totalContacts: 0,
-    lastLogin: new Date().toISOString()
+    totalProducts: 0
   })
-  const [recentArticles, setRecentArticles] = useState<RecentArticle[]>([])
   const [isLoadingStats, setIsLoadingStats] = useState(true)
   const router = useRouter()
 
@@ -58,7 +45,7 @@ export default function AdminDashboardPage() {
     }
   }, [user, loading, router])
 
-  // Load real stats from Firebase
+  // Load basic stats from Firebase
   useEffect(() => {
     if (user) {
       loadDashboardStats()
@@ -79,22 +66,10 @@ export default function AdminDashboardPage() {
       console.log('📚 Found', articles.length, 'articles')
       console.log('📦 Found', products.length, 'products')
       
-      // Get recent articles
-      const recent = articles.slice(0, 3).map(article => ({
-        id: article.id,
-        title: article.title,
-        status: 'Published' as const,
-        publishedAt: article.publishedAt
-      }))
-      
-      setRecentArticles(recent)
-      
       // Update stats with real data
       setStats({
         totalArticles: articles.length,
-        totalProducts: products.length,
-        totalContacts: 12, // TODO: Replace with real contact form data when implemented
-        lastLogin: new Date().toISOString()
+        totalProducts: products.length
       })
       
       console.log('✅ Dashboard stats loaded')
@@ -156,13 +131,6 @@ export default function AdminDashboardPage() {
       color: 'solar-racing'
     },
     {
-      title: 'View Contact Forms',
-      description: 'Check customer inquiries',
-      icon: Mail,
-      href: '/admin/contacts',
-      color: 'solar-electric'
-    },
-    {
       title: 'Database Utilities',
       description: 'Seed articles and manage database',
       icon: Database,
@@ -175,41 +143,13 @@ export default function AdminDashboardPage() {
       icon: Settings,
       href: '/admin/settings',
       color: 'solar-electric'
-    }
-  ]
-
-  const statsCards = [
-    {
-      title: 'Published Articles',
-      value: stats.totalArticles,
-      icon: BookOpen,
-      color: 'solar-electric',
-      change: stats.totalArticles > 0 ? 'From Firebase' : 'No articles yet',
-      isReal: true
     },
     {
-      title: 'Products Listed',
-      value: stats.totalProducts,
-      icon: Package,
-      color: 'solar-gold',
-      change: stats.totalProducts > 0 ? 'Current One, Solar Modules, Cansuba' : 'No products yet',
-      isReal: true
-    },
-    {
-      title: 'Contact Inquiries', 
-      value: stats.totalContacts,
-      icon: Mail,
-      color: 'solar-racing',
-      change: '+5 this week',
-      isReal: false // TODO: Make this real when contact form backend is implemented
-    },
-    {
-      title: 'Active Team Members',
-      value: '5',
-      icon: Users,
-      color: 'solar-electric',
-      change: 'Engineering & Admin',
-      isReal: true
+      title: 'View Live Site',
+      description: 'See the public website',
+      icon: Eye,
+      href: '/',
+      color: 'solar-racing'
     }
   ]
 
@@ -220,36 +160,31 @@ export default function AdminDashboardPage() {
       
       {/* Header */}
       <header className="relative z-10 bg-solar-carbon/95 backdrop-blur-sm border-b border-white/10">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-racing font-bold text-white">
+              <h1 className="text-3xl font-racing font-bold text-white mb-2">
                 Admin Dashboard
               </h1>
-              <p className="text-white/70 text-sm font-tech">
-                Welcome back, {user.email?.split('@')[0]}
+              <p className="text-white/70 font-tech">
+                Welcome back, {user?.email?.split('@')[0] || 'Admin'}
               </p>
             </div>
             
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleRefreshStats}
-                loading={isLoadingStats}
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
+            <div className="flex items-center space-x-4">
+              <Button onClick={handleRefreshStats} variant="outline" size="sm">
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingStats ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
               
-              <Link href="/" target="_blank">
-                <Button variant="ghost" size="sm">
+              <Link href="/">
+                <Button variant="outline" size="sm">
                   <Eye className="w-4 h-4 mr-2" />
                   View Site
                 </Button>
               </Link>
               
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <Button onClick={handleLogout} variant="ghost" size="sm">
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
@@ -258,66 +193,106 @@ export default function AdminDashboardPage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="relative z-10 container mx-auto px-6 py-8 pt-24">
+      <main className="relative z-10 container mx-auto px-6 py-8">
         
-        {/* Welcome Section */}
+        {/* Quick Overview Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="grid md:grid-cols-4 gap-6 mb-12"
         >
-          <div className="bg-gradient-to-r from-solar-electric/20 via-solar-gold/20 to-solar-racing/20 backdrop-blur-sm rounded-2xl border border-white/20 p-8">
-            <h2 className="text-3xl font-racing font-bold text-white mb-4">
-              Content & Product Management
-            </h2>
-            <p className="text-white/90 font-tech text-lg max-w-3xl">
-              Manage educational content, product information, and customer communications for Ensten AB. 
-              Create engaging technical guides and maintain up-to-date product availability for teams worldwide.
-            </p>
+          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-racing font-bold text-white mb-1">
+                  {isLoadingStats ? (
+                    <div className="w-8 h-8 bg-white/20 animate-pulse rounded" />
+                  ) : (
+                    stats.totalArticles
+                  )}
+                </div>
+                <div className="text-white/80 font-tech text-sm">
+                  Published Articles
+                </div>
+                <div className="text-green-400 font-tech text-xs mt-1">
+                  From Firebase
+                </div>
+              </div>
+              <BookOpen className="w-8 h-8 text-solar-electric" />
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-racing font-bold text-white mb-1">
+                  {isLoadingStats ? (
+                    <div className="w-8 h-8 bg-white/20 animate-pulse rounded" />
+                  ) : (
+                    stats.totalProducts
+                  )}
+                </div>
+                <div className="text-white/80 font-tech text-sm">
+                  Products Listed
+                </div>
+                <div className="text-green-400 font-tech text-xs mt-1">
+                  From Firebase
+                </div>
+              </div>
+              <Package className="w-8 h-8 text-solar-gold" />
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-racing font-bold text-white mb-1">
+                  Ready
+                </div>
+                <div className="text-white/80 font-tech text-sm">
+                  System Status
+                </div>
+                <div className="text-green-400 font-tech text-xs mt-1">
+                  All systems operational
+                </div>
+              </div>
+              <BarChart3 className="w-8 h-8 text-solar-racing" />
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-racing font-bold text-white mb-1">
+                  Live
+                </div>
+                <div className="text-white/80 font-tech text-sm">
+                  Website Status
+                </div>
+                <div className="text-green-400 font-tech text-xs mt-1">
+                  Connected to Firebase
+                </div>
+              </div>
+              <Eye className="w-8 h-8 text-solar-electric" />
+            </div>
           </div>
         </motion.div>
 
-        {/* Stats Grid */}
+        {/* Content & Product Management */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+          className="mb-12"
         >
-          {statsCards.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6 hover:border-white/40 transition-all duration-300 relative"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 bg-${stat.color} rounded-lg flex items-center justify-center`}>
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center">
-                  {stat.isReal ? (
-                    <div className="w-2 h-2 bg-green-400 rounded-full" title="Real data from Firebase" />
-                  ) : (
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full" title="Mock data" />
-                  )}
-                </div>
-              </div>
-              
-              <div className="text-2xl font-racing font-bold text-white mb-1">
-                {isLoadingStats && stat.isReal ? (
-                  <div className="w-16 h-8 bg-white/20 animate-pulse rounded" />
-                ) : (
-                  stat.value
-                )}
-              </div>
-              <div className="text-white/80 font-tech text-sm mb-2">
-                {stat.title}
-              </div>
-              <div className={`font-tech text-xs ${stat.isReal ? 'text-green-400' : 'text-yellow-400'}`}>
-                {stat.change}
-              </div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-racing font-bold text-white">
+              Content & Product Management
+            </h2>
+            <div className="text-white/60 font-tech text-sm">
+              Manage educational content, product information, and customer communications for Ensten AB
             </div>
-          ))}
+          </div>
         </motion.div>
 
         {/* Quick Actions */}
@@ -349,102 +324,6 @@ export default function AdminDashboardPage() {
           </div>
         </motion.div>
 
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="grid lg:grid-cols-2 gap-8"
-        >
-          {/* Recent Articles - Now with real data */}
-          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-racing font-bold text-white flex items-center">
-                Recent Articles
-                <div className="w-2 h-2 bg-green-400 rounded-full ml-2" title="Real data from Firebase" />
-              </h3>
-              <Link href="/admin/blog">
-                <Button variant="ghost" size="sm">View All</Button>
-              </Link>
-            </div>
-            
-            <div className="space-y-4">
-              {isLoadingStats ? (
-                // Loading skeleton
-                Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="py-3 border-b border-white/10 last:border-0">
-                    <div className="w-3/4 h-4 bg-white/20 animate-pulse rounded mb-2" />
-                    <div className="w-1/2 h-3 bg-white/10 animate-pulse rounded" />
-                  </div>
-                ))
-              ) : recentArticles.length > 0 ? (
-                recentArticles.map((article, i) => (
-                  <div key={i} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
-                    <div>
-                      <h4 className="text-white font-tech font-semibold text-sm">
-                        {article.title.length > 50 ? `${article.title.substring(0, 50)}...` : article.title}
-                      </h4>
-                      <p className="text-white/60 text-xs font-tech">
-                        {new Date(article.publishedAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span className="px-2 py-1 rounded-full text-xs font-tech bg-green-500/20 text-green-300">
-                      {article.status}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <BookOpen className="w-8 h-8 text-white/40 mx-auto mb-2" />
-                  <p className="text-white/60 font-tech text-sm">No articles found</p>
-                  <Link href="/admin/utilities">
-                    <Button variant="ghost" size="sm" className="mt-2">
-                      Seed Sample Articles
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* System Status */}
-          <div className="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-6">
-            <h3 className="text-lg font-racing font-bold text-white mb-6">System Status</h3>
-            
-            <div className="space-y-4">
-              {[
-                { service: 'Website', status: 'Operational', uptime: '99.9%' },
-                { service: 'Firebase Database', status: 'Connected', uptime: '99.8%' },
-                { service: 'Authentication', status: 'Active', uptime: '100%' },
-                { service: 'Admin Panel', status: 'Ready', uptime: '99.9%' }
-              ].map((service, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-400 rounded-full mr-3" />
-                    <span className="text-white font-tech text-sm">{service.service}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-green-400 text-xs font-tech">{service.status}</div>
-                    <div className="text-white/60 text-xs font-tech">{service.uptime}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-white/20">
-              <div className="text-xs text-white/60 font-tech">
-                <div className="flex items-center mb-1">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2" />
-                  Real-time data from Firebase
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2" />
-                  Placeholder data (to be implemented)
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </main>
     </div>
   )
