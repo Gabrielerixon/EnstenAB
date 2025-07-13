@@ -2,7 +2,7 @@
 
 import { Hero } from '@/components/hero/Hero'
 import { motion } from 'framer-motion'
-import { Ship, Car } from 'lucide-react'
+import { Car } from 'lucide-react'
 import TestimonialsSection from '@/components/sections/TestimonialsSection' 
 import Link from 'next/link'
 import Image from 'next/image'

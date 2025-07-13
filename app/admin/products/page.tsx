@@ -26,7 +26,7 @@ import { Product } from '@/lib/types'
 import Link from 'next/link'
 import Image from 'next/image'
 
-type ProductAvailability = 'available' | 'pre-order' | 'coming-soon' | 'discontinued'
+
 
 const availabilityLabels = {
   'available': 'In Stock',
