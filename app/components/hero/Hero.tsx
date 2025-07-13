@@ -57,7 +57,7 @@ export const Hero = () => {
           <motion.div
             initial={{ opacity: 0}}
             animate={{ opacity: 1}}
-            transition={{ duration: 1, delay: 0.8 }}
+            transition={{ duration: 1}}
             className="relative mx-auto mb-16 w-full"
           >
             {/* UPDATED: Using lazy-loading 3D showcase */}
@@ -72,7 +72,7 @@ export const Hero = () => {
                     className="h-full bg-solar-electric"
                     initial={{ width: 0 }}
                     animate={{ width: "95%" }}
-                    transition={{ duration: 2, delay: 1 }}
+                    transition={{ duration: 2 }}
                   />
                 </div>
                 <div className="w-12 md:w-16 h-1 bg-white/20 rounded-full overflow-hidden">
@@ -80,7 +80,7 @@ export const Hero = () => {
                     className="h-full bg-solar-gold"
                     initial={{ width: 0 }}
                     animate={{ width: "98%" }}
-                    transition={{ duration: 2, delay: 1.2 }}
+                    transition={{ duration: 2 }}
                   />
                 </div>
                 <div className="w-12 md:w-16 h-1 bg-white/20 rounded-full overflow-hidden">
@@ -88,7 +88,7 @@ export const Hero = () => {
                     className="h-full bg-solar-racing"
                     initial={{ width: 0 }}
                     animate={{ width: "92%" }}
-                    transition={{ duration: 2, delay: 1.4 }}
+                    transition={{ duration: 2 }}
                   />
                 </div>
               </div>
