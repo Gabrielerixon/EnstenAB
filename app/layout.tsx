@@ -17,23 +17,103 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "Ensten AB - Control Your Solar-Powered Car",
-  description: "Current One control unit designed for solar-powered vehicles competing in the Bridgestone World Solar Challenge 2025. Engineered for optimal performance and efficiency.",
-  keywords: ["Ensten AB", "Current One", "solar racing", "control unit", "BWSC 2025", "Bridgestone World Solar Challenge", "solar car", "solar-powered vehicle"],
-  authors: [{ name: "Ensten AB" }],
-  openGraph: {
-    title: "Ensten AB - Control Your Solar-Powered Car",
-    description: "Current One control unit for solar racing championship performance",
-    url: "https://ensten.org",
-    siteName: "Ensten AB",
-    locale: "en_US",
-    type: "website",
+  title: {
+    default: "Ensten AB - Control Your Solar Racing Future",
+    template: "%s | Ensten AB"
   },
+  description: "Avancerade kontrollenheter och komponenter för solracingfordon. Vi ger team möjligheten att nå topprestanda i Bridgestone World Solar Challenge.",
+  keywords: [
+    // Svenska nyckelord (viktigt för svensk marknad)
+    'solracing', 'kontrollenhet', 'solbil', 'BWSC', 'Bridgestone World Solar Challenge',
+    'solenergi', 'racing', 'Jönköping', 'Sverige', 'kontrollsystem', 'Current One',
+    // Engelska nyckelord
+    'solar racing', 'control unit', 'solar car', 'solar panels', 'Ensten AB'
+  ],
+  authors: [{ name: "Ensten AB", url: "https://ensten.org" }],
+  creator: "Ensten AB",
+  publisher: "Ensten AB",
+  
+  // Open Graph (för Facebook, LinkedIn etc)
+  openGraph: {
+    type: 'website',
+    locale: 'sv_SE',
+    alternateLocale: 'en_US',
+    url: 'https://ensten.org',
+    siteName: 'Ensten AB',
+    title: 'Ensten AB - Control Your Solar Racing Future',
+    description: 'Avancerade kontrollenheter för solracingfordon. Topprestanda i BWSC.',
+    images: [
+      {
+        url: '/opengraph-image', // Använder din automatiska OG-image
+        width: 1200,
+        height: 630,
+        alt: 'Ensten AB - Solar Racing Control Systems',
+      }
+    ],
+  },
+
+  // Twitter Card
+  twitter: {
+    card: 'summary_large_image',
+    site: '@ensten_ab', // Om ni har Twitter
+    creator: '@ensten_ab',
+    title: 'Ensten AB - Solar Racing Control Systems',
+    description: 'Avancerade kontrollenheter för solracingfordon',
+    images: ['/opengraph-image'], // Använder samma som OG
+  },
+
+  // Robots
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
-};
+
+  // Verification (lägg till när ni har dessa)
+  verification: {
+    google: 'your-google-site-verification-code',
+    // yandex: 'your-yandex-verification-code',
+  },
+
+  // Canonical URL
+  metadataBase: new URL('https://ensten.org'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'sv-SE': '/sv',
+      'en-US': '/en',
+    },
+  },
+
+  // Ensten Favicon - Integrerat i metadata
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+    ]
+  },
+
+  // Additional meta tags
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'msapplication-TileColor': '#0A0A0A',
+    'theme-color': '#0A0A0A',
+  },
+
+  // Web App Manifest
+  manifest: '/site.webmanifest',
+}
 
 export default function RootLayout({
   children,

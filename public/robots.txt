@@ -1,0 +1,19 @@
+# robots.txt för ensten.org
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://ensten.org/sitemap.xml
+
+# Blockera admin-sidor
+Disallow: /admin/
+Disallow: /api/
+
+# Tillåt viktiga sidor explicit
+Allow: /products
+Allow: /about
+Allow: /contact
+Allow: /education
+
+# Crawler-delay för att vara snäll mot servern
+Crawl-delay: 1
