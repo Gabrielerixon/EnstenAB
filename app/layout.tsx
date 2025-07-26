@@ -3,6 +3,7 @@ import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
+import { StructuredData } from '@/components/seo/StructuredData'
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -123,6 +124,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable} ${orbitron.variable}`}>
       <body className={`${inter.className} relative bg-solar-carbon antialiased`}>
+        {/* Ensten AB Organization Structured Data - På alla sidor */}
+        <StructuredData />
+        
         {/* Background Effects */}
         <div className="fixed inset-0 z-0 overflow-hidden">
           {/* Base gradient background */}
