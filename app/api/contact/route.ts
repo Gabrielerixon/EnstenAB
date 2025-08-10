@@ -6,6 +6,15 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if API key is configured
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured');
+      return NextResponse.json(
+        { error: 'Email service not configured' }, 
+        { status: 500 }
+      );
+    }
+
     const { name, email, company, subject, message, inquiryType } = await request.json();
 
     // Validation
@@ -16,10 +25,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email address' }, 
+        { status: 400 }
+      );
+    }
+
+    console.log('Sending email to Resend...');
+    
     const { data, error } = await resend.emails.send({
-      from: 'contact@ensten.org', // Update to your domain
-      to: ['info@ensten.org'], // Update to your domain  
-      replyTo: email, // Allow direct replies to the sender
+      from: 'contact@ensten.org',
+      to: ['info@ensten.org'],
+      replyTo: email,
       subject: `[${inquiryType}] ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -52,25 +72,32 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Resend error:', error);
       return NextResponse.json(
-        { error: 'Failed to send email' }, 
+        { error: 'Failed to send email', details: error.message }, 
         { status: 400 }
       );
     }
 
-    // Optional: Send confirmation email to sender
-    await resend.emails.send({
-      from: 'noreply@yourdomain.com',
-      to: email,
-      subject: 'Thank you for contacting Ensten AB',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #FF6B35;">Thank you for reaching out!</h2>
-          <p>Hi ${name},</p>
-          <p>We've received your message and will get back to you within 24 hours.</p>
-          <p>Best regards,<br>The Ensten AB Team</p>
-        </div>
-      `,
-    });
+    console.log('Email sent successfully:', data);
+
+    // Send confirmation email to the user
+    try {
+      await resend.emails.send({
+        from: 'noreply@ensten.org', // Fixed: use your domain
+        to: email,
+        subject: 'Thank you for contacting Ensten AB',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #FF6B35;">Thank you for reaching out!</h2>
+            <p>Hi ${name},</p>
+            <p>We've received your message and will get back to you within 24 hours.</p>
+            <p>Best regards,<br>The Ensten AB Team</p>
+          </div>
+        `,
+      });
+    } catch (confirmationError) {
+      console.error('Failed to send confirmation email:', confirmationError);
+      // Don't fail the whole request if confirmation email fails
+    }
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
