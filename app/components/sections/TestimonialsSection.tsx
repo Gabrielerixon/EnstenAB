@@ -99,7 +99,7 @@ export default function TestimonialsSection() {
               transition={{ duration: 0.6, delay: index * 0.2 }}
               className="group relative"
             >
-              <div className="h-full bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-8 hover:border-white/40 transition-all duration-300 card-hover">
+              <div className="h-full bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-sm rounded-xl border border-white/20 p-8 pt-10 hover:border-white/40 transition-all duration-300 card-hover">
                 
                 {/* Achievement Badge */}
                 <div className="absolute top-4 right-4 bg-solar-racing text-white px-3 py-1 rounded-full text-xs font-tech font-semibold flex items-center">
