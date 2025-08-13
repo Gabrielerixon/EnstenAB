@@ -114,7 +114,7 @@ export default function ContactPage() {
       }
 
       setFormStatus('success')
-      setStatusMessage('Message sent successfully! We&apos;ll get back to you within 24 hours.')
+      setStatusMessage("Message sent successfully! We'll get back to you within 24 hours.")
       
       // Reset form
       setFormData({
