@@ -4,6 +4,7 @@ import "./globals.css";
 import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { StructuredData } from '@/components/seo/StructuredData'
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -170,6 +171,7 @@ export default function RootLayout({
           </main>
           <ConditionalFooter />
         </div>
+        <Analytics/>
       </body>
     </html>
   );
